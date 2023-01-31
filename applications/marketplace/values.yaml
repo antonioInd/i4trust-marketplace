@@ -406,7 +406,8 @@ business-api-ecosystem:
       version: 7.5
 
     ## -- Base app path of logic proxy
-    basePath: /opt/business-ecosystem-logic-proxy
+    #basePath: /opt/business-ecosystem-logic-proxy
+    basePath: /business-ecosystem-logic-proxy
 
     ## -- Custom theme configuration
     theme:
