@@ -1,0 +1,94 @@
+## values to be used for deployement in demonstrator namespaces
+## additional config file is used, since we rely on managed databases there.
+
+source: https://github.com/FIWARE-Ops/i4trust-marketplace
+release: i4t-mp-demo
+destination_namespace: &destination i4t-mp-demo
+branch: &branch main
+secretsEnabled: &secretsEnabled false
+
+applications:
+  - name: mongodb
+    enabled: true
+    source_path: applications/mongodb
+    source_ref: *branch
+    destination: *destination
+    helm_values:
+    - values.yaml
+    values:
+      initDb:
+        idp: {}
+    #      - name: "Service Provider"
+    #        id: "EU.EORI.DEPROVIDER"
+    #        server: "https://provider-keyrock-0-i4t-mp-main.apps.fiware.fiware.dev"
+    #        description: "Employee IDP of Service Provider"
+    #        callbackURL: "https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev/auth/EU.EORI.DEPROVIDER/callback"
+
+  - name: mysql
+    enabled: true
+    source_path: applications/mysql
+    source_ref: *branch
+    destination: *destination
+    helm_values:
+    - values.yaml
+
+  - name: elastic
+    enabled: true
+    source_path: applications/elastic
+    source_ref: *branch
+    destination: *destination
+    helm_values:
+    - values.yaml
+
+  - name: keyrock
+    enabled: true
+    source_path: applications/keyrock
+    source_ref: *branch
+    destination: *destination
+    helm_values:
+    - values.yaml
+    values:
+      marketplace:
+        id: 71049899-b919-4d0f-9303-e5d2fd1bbb90
+        url: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev
+        redirectUrl: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev/auth/fiware/callback
+      keyrock:
+        host: https://keyrock-0-i4t-mp-main.apps.fiware.fiware.dev
+        
+  - name: marketplace
+    enabled: true
+    source_path: applications/marketplace
+    source_ref: *branch
+    destination: *destination
+    helm_values:
+    - values.yaml
+    values:
+      loadPlugins:
+        targetNamespace: i4t-mp-main
+      initData:
+        lpHref: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev
+        targetNamespace: i4t-mp-main
+        i4trust:
+          lpHrefInternal: http://marketplace-biz-ecosystem-logic-proxy.i4t-mp-main.svc.cluster.local:8004
+          serviceEndpoint: https://provider-kong-kong-i4t-mp-main.apps.fiware.fiware.dev/diagnosis-i4trust/ngsi-ld/v1
+          arEndpoint: https://provider-as-activation-service-i4t-mp-main.apps.fiware.fiware.dev
+      business-api-ecosystem:
+        oauth:
+          server: https://keyrock-0-i4t-mp-main.apps.fiware.fiware.dev
+          clientId: 71049899-b919-4d0f-9303-e5d2fd1bbb90
+          clientSecret: f7e11746-b84f-4748-86e5-107146e888h7
+        externalUrl: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev
+        bizEcosystemChargingBackend:
+          db:
+            host: mongodb.i4t-mp-main.svc.cluster.local
+        bizEcosystemLogicProxy:
+          db:
+            host: mongodb.i4t-mp-main.svc.cluster.local
+
+  - name: ishare-satellite
+    enabled: true
+    source_path: applications/satellite
+    source_ref: *branch
+    destination: *destination
+    helm_values:
+    - values.yaml

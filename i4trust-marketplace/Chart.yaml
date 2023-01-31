@@ -1,0 +1,8 @@
+apiVersion: v2
+name: i4trust-marketplace
+description: Helm chart to deploy the i4Trust Marketplace components and a test satellite
+type: application
+version: 0.0.1
+maintainers:
+  - name: Dennis Wendland
+    email: dennis.wendland@fiware.org
