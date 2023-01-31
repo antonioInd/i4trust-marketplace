@@ -19,7 +19,7 @@ data:
     import sys
     
     def main():
-      KEYROCK_HOST = "http://hella-keyrock:8080"
+      KEYROCK_HOST = "http://provider-keyrock:8080"
       APIS_HOST = "http://marketplace-biz-ecosystem-apis:8080"
       LP_INTERNAL_HOST = {{ .Values.initData.i4trust.lpHrefInternal | quote }}
       LP_EXTERNAL_HOST = {{ .Values.initData.lpHref | quote }}
@@ -27,10 +27,10 @@ data:
       SERVICE_ENDPOINT = {{ .Values.initData.i4trust.serviceEndpoint | quote }}
       AR_ENDPOINT = {{ .Values.initData.i4trust.arEndpoint | quote }}
       OPERATOR_USER = "provider-operator"
-      PROVIDER_EORI = "EU.EORI.DEHELLA"
+      PROVIDER_EORI = "EU.EORI.DEPROVIDER"
       PLUGIN_ID = "ngsi-ld-data-service"
       ASSET_TYPE = "NGSI-LD Data Service"
-      CATALOG_NAME = "Car Diagnosis"
+      CATALOG_NAME = "Packet Delivery"
       MONGODB_HOST = "mongodb"
       MONGODB_USER = "root"
       MONGODB_PW = "dbPassword"
@@ -316,9 +316,9 @@ data:
                 "role": "Owner"
             }
         ],
-        "name": "Car Diagnosis Product (i4Trust)",
-        "brand": "Diagnosis Provider",
-        "description": "Car Diagnosis data service product"
+        "name": "Packet Delivery Product (i4Trust)",
+        "brand": "Packet Delivery Co.",
+        "description": "Packet Delivery data service product"
       }
       print("Create productSpecification and get ID")
       spec_response = requests.post(APIS_HOST+'/DSProductCatalog/api/catalogManagement/v2/productSpecification', json=spec_data, headers=spec_header)
@@ -366,10 +366,10 @@ data:
       offering_data = {
         "bundledProductOffering": [],
         "category": [],
-        "description": "Car Diagnosis data service",
+        "description": "Packet Delivery data service",
         "isBundle": False,
         "lifecycleStatus": "Launched",
-        "name": "Car Diagnosis Service (i4Trust)",
+        "name": "Packet Delivery Service (i4Trust)",
         "place": [],
         "productOfferingPrice": [],
         "validFor": {
@@ -421,7 +421,7 @@ data:
         "off_id": str(offering_id),
         "href": offering_href,
         "owner_organization_id": ObjectId(org_id),
-        "name": "Car Diagnosis service",
+        "name": "Packet Delivery service",
         "version": "1.0",
         "description": "",
         "is_digital": True,
