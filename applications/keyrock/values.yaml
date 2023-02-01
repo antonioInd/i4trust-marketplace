@@ -104,6 +104,7 @@ keyrock:
 
 marketplace:
   id: marketplace-id
+  secret: f7e11746-b84f-4748-86e5-107146e888h7
   name: Marketplace
   description: Keyrock client for the marketplace.
   url: http://marketplace.i4trust.fiware.dev

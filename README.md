@@ -36,7 +36,8 @@ or check in the OpenShift console or in ArgoCD.
 
 For the marketplace, when the branch was called `demo`, this might give you something like
 ```shell
-XYZ
+NAME                                                               HOST/PORT                                                                    PATH   SERVICES                                PORT    TERMINATION     WILDCARD
+route.route.openshift.io/marketplace-biz-ecosystem-logic-proxy-0   marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-demo.apps.fiware.fiware.dev          marketplace-biz-ecosystem-logic-proxy   <all>   edge/Redirect   None
 ```
 The marketplace logic proxy would be available under the URL: `https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-demo.apps.fiware.fiware.dev`.
 
@@ -55,7 +56,7 @@ Different accounts are created automatically with default passwords.
 |---------------|------------------------|-------------------|---------|
 | Keyrock Marketplace | admin@test.com | admin | Admin user of the marketplace |
 
-Root CA, keys and certificates have been created and self-signed using openssl. Keys and certificates used for this PoC 
+Root CA, keys and certificates have been created and self-signed using openssl. Keys and certificates used for this demonstrator 
 can be found in the [certs folder](./certs). These should never be used in any kind of production enviroment or on a 
 contineously running environment.  
 Below table displays the assigned EORIs assigned to the different organisations and their keys/certificates:

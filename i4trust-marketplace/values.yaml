@@ -50,6 +50,7 @@ applications:
     values:
       marketplace:
         id: 71049899-b919-4d0f-9303-e5d2fd1bbb90
+        secret: f7e11746-b84f-4748-86e5-107146e888h7
         url: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev
         redirectUrl: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev/auth/fiware/callback
       keyrock:

@@ -21,7 +21,7 @@ spec:
         - name: DB_PASSWORD
           value: dbPassword
         - name: APP_SECRET
-          value: f7e11746-b84f-4748-86e5-107146e888h7
+          value: {{ .Values.marketplace.secret | quote }}
   volumes:
     - name: scripts
       configMap:
