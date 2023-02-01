@@ -65,6 +65,8 @@ keyrock:
   initScript:
     ## -- Enable init script
     enabled: true
+    ## -- Database name for init script
+    dbName: idm
     
   ## Certificates configuration
   certs:
