@@ -610,7 +610,19 @@ loadPlugins:
 
 initData:
   ## Create billing addresses for consuming parties as post-hook
-  addressEnabled: false
+  createAddress:
+    addressEnabled: false
+    customer: []
+      #- keyrockHost: "http://consumerone-keyrock:8080"
+      #  username: "consumerone-operator"
+      #  email: "operator@consumerone.com"
+      #  streetOne: "Consumerstr. 15"
+      #  postcode: "12345"
+      #  city: "Berlin"
+      #  stateOrProvince: "Berlin"
+      #  country: "DE"
+      #  phoneType: "Office"
+      #  phoneNumber: "+4915121234567"
   ## Create a catalog for service provider
   catalogEnabled: false
   ## Reloading of indexes after creation of objects

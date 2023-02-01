@@ -140,43 +140,44 @@ data:
       print(" --> BillingAccount created")
 
     def main():
-      # Create for consumer1
+
+      {{- range $v := .Values.initData.createAddress.customer }}
+      
+      # Create address for {{ $v.username }}
       contact_medium = [
         {
             "preferred": False,
             "type": "Email",
             "medium": {
-                "emailAddress":
-                "operator@consumerone.com"
+                "emailAddress": {{ $v.email | quote }}
             }
         },
         {
             "preferred": False,
             "type": "PostalAddress",
             "medium": {
-                "streetOne":
-                "Consumerstr. 15",
-                "postcode": "12345",
-                "city": "Berlin",
-                "stateOrProvince": "Berlin",
-                "country": "DE"
+                "streetOne": {{ $v.streetOne | quote }},
+                "postcode": {{ $v.postcode | quote }},
+                "city": {{ $v.city | quote }},
+                "stateOrProvince": {{ $v.stateOrProvince | quote }},
+                "country": {{ $v.country | quote }}
             }
         },
         {
             "preferred": False,
             "type": "TelephoneNumber",
             "medium": {
-                "type": "Office",
-                "number": "+4915121234567"
+                "type": {{ $v.phoneType | quote }},
+                "number": {{ $v.phoneNumber | quote }}
             }
         }
       ]
       print("********")
-      print("Create address for <consumerone>")
-      createAddress("http://consumerone-keyrock:8080", "consumerone-operator", contact_medium)
+      print("Create address for <{{ $v.username }}>")
+      createAddress({{ $v.keyrockHost | quote }}, {{ $v.username | quote }}, contact_medium)
       print("********")
       print("")
-      
+      {{- end }}
 
     
     if __name__ == "__main__":
