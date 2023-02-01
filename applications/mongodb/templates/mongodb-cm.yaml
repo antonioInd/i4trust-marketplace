@@ -37,9 +37,9 @@ data:
       "server" : {{ $v.server | quote }},
       "description" : {{ $v.description | quote }},
       "provider" : "i4trust",
-      "clientID" : {{ .Values.initDb.externalIdp.clientID | quote }},
-      "tokenKey" : {{ .Values.initDb.externalIdp.tokenKey | quote }},
-      "tokenCrt" : {{ .Values.initDb.externalIdp.tokenCrt | quote }},
+      "clientID" : {{ $.Values.initDb.externalIdp.clientID | quote }},
+      "tokenKey" : {{ $.Values.initDb.externalIdp.tokenKey | quote }},
+      "tokenCrt" : {{ $.Values.initDb.externalIdp.tokenCrt | quote }},
       "callbackURL" : {{ $v.callbackURL | quote }}
     });
     {{- end }}
