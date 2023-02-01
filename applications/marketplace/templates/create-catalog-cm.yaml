@@ -16,12 +16,12 @@ data:
     from requests.exceptions import HTTPError
     import sys
 
-    def main():
-      KEYROCK_HOST = "http://provider-keyrock:8080"
+    def createCatalog(keyrock_hostname, user, catalog):
+      KEYROCK_HOST = keyrock_hostname
       APIS_HOST = "http://marketplace-biz-ecosystem-apis:8080"
       LP_EXTERNAL_HOST = {{ .Values.initData.lpHref | quote }}
       LP_EXTERNAL_HOST = LP_EXTERNAL_HOST+":443"
-      OPERATOR_USER = "provider-operator"
+      OPERATOR_USER = user
 
       # Login
       login_data = {
@@ -76,8 +76,8 @@ data:
                 "role": "Owner"
             }
         ],
-        "name": "Car Diagnosis",
-        "description": "Offerings about car diagnosis services"
+        "name": catalog['name'],
+        "description": catalog['description']
       }
       print("Create Catalog and get ID")
       catalog_response = requests.post(APIS_HOST+'/DSProductCatalog/api/catalogManagement/v2/catalog', json=catalog_data, headers=catalog_header)
@@ -91,6 +91,24 @@ data:
         sys.exit(3)
       catalog_id = catalog_response.json()['id']
       print(" --> Created! Catalog ID:", catalog_id)
+
+    def main():
+
+      {{- range $v := .Values.initData.createCatalog.catalog }}
+
+      # Create catalog {{ $v.name }}: 
+      catalog = {
+        'name': {{ $v.name | quote }},
+        'description': {{ $v.description | quote }}
+      }
+      print("********")
+      print("Create catalog {{ $v.name }}")
+      createCatalog({{ $v.keyrockHost | quote }}, {{ $v.username | quote }}, catalog)
+      print("********")
+      print("")
+      {{- end }}
+      
+      
       
     if __name__ == "__main__":
       main()

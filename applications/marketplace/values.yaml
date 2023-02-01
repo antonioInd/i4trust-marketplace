@@ -623,8 +623,14 @@ initData:
       #  country: "DE"
       #  phoneType: "Office"
       #  phoneNumber: "+4915121234567"
-  ## Create a catalog for service provider
-  catalogEnabled: false
+  ## Create catalogs for the service provider
+  createCatalog:
+    catalogEnabled: false
+    catalog: []
+      #- name: "Packet Delivery services"
+      #  description: "Offerings for packet delivery services"
+      #  keyrockHost: "http://consumerone-keyrock:8080"
+      #  username: "consumerone-operator"
   ## Reloading of indexes after creation of objects
   indexesEnabled: false
   ## href base path of LP

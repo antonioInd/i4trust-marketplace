@@ -1,4 +1,4 @@
-{{- if .Values.initData.catalogEnabled -}}
+{{- if .Values.initData.createCatalog.catalogEnabled -}}
 apiVersion: v1
 kind: Pod
 metadata:
