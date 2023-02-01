@@ -68,9 +68,13 @@ mongodb:
 
 
 initDb:
-  idp: {}
-    #- name: "Service Provider"
-    #  id: "EU.EORI.DEPROVIDER"
-    #  server: "https://provider-keyrock-0-i4t-mp-main.apps.fiware.fiware.dev"
-    #  description: "Employee IDP of Service Provider"
-    #  callbackURL: "https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev/auth/EU.EORI.DEPROVIDER/callback"
+  externalIdp:
+    clientID: "EU.EORI.DEMARKETPLACE"
+    tokenKey: "/business-ecosystem-logic-proxy/key.pem"
+    tokenCrt: "/business-ecosystem-logic-proxy/cert.pem"
+    idp: {}
+      #- name: "Service Provider"
+      #  id: "EU.EORI.DEPROVIDER"
+      #  server: "https://provider-keyrock-0-i4t-mp-main.apps.fiware.fiware.dev"
+      #  description: "Employee IDP of Service Provider"
+      #  callbackURL: "https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev/auth/EU.EORI.DEPROVIDER/callback"
