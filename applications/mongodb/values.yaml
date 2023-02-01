@@ -72,7 +72,7 @@ initDb:
     clientID: "EU.EORI.DEMARKETPLACE"
     tokenKey: "/business-ecosystem-logic-proxy/key.pem"
     tokenCrt: "/business-ecosystem-logic-proxy/cert.pem"
-    idp: {}
+    idp: []
       #- name: "Service Provider"
       #  id: "EU.EORI.DEPROVIDER"
       #  server: "https://provider-keyrock-0-i4t-mp-main.apps.fiware.fiware.dev"
