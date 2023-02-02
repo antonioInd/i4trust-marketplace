@@ -604,7 +604,7 @@ business-api-ecosystem:
 
 loadPlugins:
   ## Load plugins as post-hook
-  enabled: true
+  pluginsEnabled: true
   ## Target namespace for plugin installation
   targetNamespace: i4t-mp-main
 

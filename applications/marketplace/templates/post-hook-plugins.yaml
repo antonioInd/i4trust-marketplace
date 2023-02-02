@@ -1,4 +1,4 @@
-{{- if .Values.loadPlugins.enabled -}}
+{{- if .Values.loadPlugins.pluginsEnabled -}}
 apiVersion: v1
 kind: Pod
 metadata:
