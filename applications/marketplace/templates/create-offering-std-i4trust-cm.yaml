@@ -9,8 +9,44 @@ metadata:
 data:
   entrypoint.sh: |-
     pip install requests pymongo
-    echo "Creating offering for i4Trust..."
+    echo "Creating i4Trust offerings for standard OIDC..."
     python /scripts/create.py
+
+    {{- if or .Values.initData.createOfferings.standardI4Trust.basicEnabled .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
+
+    echo "============="
+    echo "Uploading images for offerings"
+    echo "Login to OC cluster"
+    oc login $OPENSHIFT_SERVER --token="${OPENSHIFT_TOKEN}"
+    echo "Target namespace:" $TARGET_NAMESPACE
+    echo "Get ChargingBackend pod"
+    POD_NAME=`kubectl -n $TARGET_NAMESPACE get pod -l component=biz-ecosystem-charging-backend -o jsonpath='{.items[0].metadata.name}'`
+    echo $POD_NAME
+    OPERATORID=`cat operator.txt`
+
+    echo "Create asset media directory for service provider"
+    kubectl -n $TARGET_NAMESPACE exec -i $POD_NAME -c business-api-ecosystem-biz-ecosystem-charging-backend -- mkdir -p /opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}
+
+    {{- end }}
+    
+    {{- if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
+
+    echo "Copy image for basic offering"
+    cd /scripts
+    wget {{ .Values.initData.createOfferings.standardI4Trust.basicImagePath }} -O /scripts/{{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename }}
+    kubectl -n $TARGET_NAMESPACE -c business-api-ecosystem-biz-ecosystem-charging-backend cp /scripts/{{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename }} $POD_NAME:/opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}/.
+
+    {{- end }}
+
+    {{- if .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
+
+    echo "Copy image for premium offering"
+    cd /scripts
+    wget {{ .Values.initData.createOfferings.standardI4Trust.premiumImagePath }} -O /scripts/{{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename }}
+    kubectl -n $TARGET_NAMESPACE -c business-api-ecosystem-biz-ecosystem-charging-backend cp /scripts/{{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename }} $POD_NAME:/opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}/.
+
+    {{- end }}
+    
   create.py: |-
     import requests
     from requests.exceptions import HTTPError
@@ -38,6 +74,8 @@ data:
       SPEC_BRAND = "Packet Delivery Co."
       PREMIUM_PATCH_ATTRS = "pta,pda"
       PREMIUM_PATCH_IDS = "*"
+      BASIC_IMAGE = {{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename | quote }}
+      PREMIUM_IMAGE = {{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename | quote }}
       CATALOG_NAME = offering['catalog_name']
       MONGODB_HOST = "mongodb"
       MONGODB_USER = "root"
@@ -50,16 +88,19 @@ data:
       SPEC_DESC = ""
       OFFER_NAME = ""
       OFFER_DESC = ""
+      OFFER_IMG = ""
       if offering['is_premium']:
         SPEC_NAME = "Packet Delivery Premium Service Product (Standard OIDC)"
         SPEC_DESC = "Service for retrieving and updating packet delivery order information using standard OIDC flow"
         OFFER_NAME = "Packet Delivery Premium Service (Standard OIDC)"
         OFFER_DESC = "Premium service that allows for read- and write-access on packet delivery order information. The access rights can be delegated to your customers, enabling them to view all information of their delivery orders as well as to change the planned date and time of arrival. The data service of this offering uses the standard i4Trust OIDC flow."
+        OFFER_IMG = PREMIUM_IMAGE
       else:
         SPEC_NAME = "Packet Delivery Basic Service Product (Standard OIDC)"
         SPEC_DESC = "Service for retrieving packet delivery order information using standard OIDC flow"
         OFFER_NAME = "Packet Delivery Basic Service (Standard OIDC)"
         OFFER_DESC = "Basic service that allows for read-access on packet delivery order information. The access right can be delegated to your customers, enabling them to view their delivery orders. The data service of this offering uses the standard i4Trust OIDC flow."
+        OFFER_IMG = BASIC_IMAGE
 
       # Login
       login_data = {
@@ -213,6 +254,29 @@ data:
       resource = col_resource.find_one({'_id': resource_result.inserted_id})
       resource_id = resource['_id']
       print(" --> Created resource:", resource_id, resource)
+
+      # Simulate uploadJob of image upload --> fill wstore_resource, with provider_id = _id param from created org
+      print("Insert resource for digital asset in MongoDB")
+      col_resource = db['wstore_resource']
+      img_resource_insert = {
+        "product_id": None,
+        "version": "",
+        "provider_id": ObjectId(org_id),
+        "content_type": "image/png",
+        "download_link": LP_EXTERNAL_HOST+"/charging/media/assets/"+operator_id+"/"+OFFER_IMG,
+        "resource_path": "media/assets/"+operator_id+"/"+OFFER_IMG,
+        "old_versions": None,
+        "state": "",
+        "resource_type": "",
+        "is_public": True,
+        "has_terms": False,
+        "bundled_assets": [],
+        "meta_info": {}
+      }
+      img_resource_result = col_resource.insert_one(img_resource_insert)
+      img_resource = col_resource.find_one({'_id': img_resource_result.inserted_id})
+      img_resource_id = img_resource['_id']
+      print(" --> Created resource:", img_resource_id, img_resource)
     
       # POST productSpec
       spec_header = {
@@ -336,7 +400,8 @@ data:
         "productSpecificationRelationship": [],
         "attachment": [
             {
-                "type": "Picture"
+                "type": "Picture",
+                "url": LP_EXTERNAL_HOST+"/charging/media/assets/"+operator_id+"/"+OFFER_IMG
             }
         ],
         "relatedParty": [
@@ -500,6 +565,10 @@ data:
       offering_result = col_offering.insert_one(offering_insert)
       print(" --> Created offering in DB!")
 
+      # Store operator ID in file for further processing
+      f = open("/scripts/operator.txt", "a")
+      f.write(operator_id)
+      f.close()
 
     def main():
 

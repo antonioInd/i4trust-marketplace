@@ -669,6 +669,14 @@ initData:
       catalogName: "Packet Delivery services"
       ## Resource type
       resourceType: "DELIVERYORDER"
+      ## Download path for basic offering image
+      basicImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-Standard_Basic.png"
+      ## Filename for basic offering image
+      basicImageFilename: "PacketDeliveryBasic__Offerings-Standard_Basic.png"
+      ## Download path for premium offering image
+      premiumImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-Standard_Premium.png"
+      ## Filename for premium offering image
+      premiumImageFilename: "PacketDeliveryPremium__Offerings-Standard_Premium.png"
       
     ## Offerings for i4Trust via DID and VC/VP
     didI4Trust:
