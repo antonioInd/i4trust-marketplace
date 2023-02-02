@@ -64,7 +64,7 @@ keyrock:
   ## Init script for Keyrock DB
   initScript:
     ## -- Enable init script
-    enabled: true
+    initEnabled: true
     ## -- Database name for init script
     dbName: idm
     

@@ -1,4 +1,4 @@
-{{- if .Values.keyrock.initScript.enabled -}}
+{{- if .Values.keyrock.initScript.initEnabled -}}
 apiVersion: v1
 kind: Pod
 metadata:
