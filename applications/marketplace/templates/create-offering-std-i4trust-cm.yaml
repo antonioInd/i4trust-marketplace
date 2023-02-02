@@ -27,6 +27,8 @@ data:
       SERVICE_ENDPOINT = offering['service_endpoint']
       AR_ENDPOINT = offering['ar_endpoint']
       AR_EORI = offering['ar_eori']
+      AR_TOKEN_ENDPOINT = "/token"
+      AR_POLICY_ENDPOINT = "/createpolicy"
       OPERATOR_USER = user
       PROVIDER_EORI = offering['provider_eori']
       PLUGIN_ID = offering['plugin_id']
@@ -153,8 +155,8 @@ data:
       col_resource = db['wstore_resource']
       meta_info = {
         "ar_id": AR_EORI,
-        "ar_token_endpoint": AR_ENDPOINT+"/token",
-        "ar_policy_endpoint": AR_ENDPOINT+"/createpolicy",
+        "ar_token_endpoint": AR_ENDPOINT+AR_TOKEN_ENDPOINT,
+        "ar_policy_endpoint": AR_ENDPOINT+AR_POLICY_ENDPOINT,
         "minutes": 30,
         "resource_type": offering['resource_type'],
         "get_allowed": True,
