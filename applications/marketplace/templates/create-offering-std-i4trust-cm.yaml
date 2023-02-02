@@ -506,8 +506,8 @@ data:
       offering = {
         'plugin_id': {{ .Values.initData.createOfferings.standardI4Trust.pluginId | quote }},
         'service_endpoint': {{ .Values.initData.createOfferings.standardI4Trust.serviceEndpoint | quote }},
-        'ar_endpoint': {{ .Values.initData.createOfferings.standardI4Trust.arEndpoint | quote }},
-        'ar_eori': {{ .Values.initData.createOfferings.standardI4Trust.arIdentifier | quote }},
+        'ar_endpoint': {{ .Values.initData.createOfferings.arEndpoint | quote }},
+        'ar_eori': {{ .Values.initData.createOfferings.arIdentifier | quote }},
         'catalog_name': {{ .Values.initData.createOfferings.standardI4Trust.catalogName | quote }},
         'provider_eori': {{ .Values.initData.createOfferings.standardI4Trust.providerIdentifier | quote }},
         'resource_type': {{ .Values.initData.createOfferings.standardI4Trust.resourceType | quote }}
