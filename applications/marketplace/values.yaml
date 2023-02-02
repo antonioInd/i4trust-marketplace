@@ -632,7 +632,9 @@ initData:
       #  keyrockHost: "http://consumerone-keyrock:8080"
       #  username: "consumerone-operator"
   ## Reloading of indexes after creation of objects
-  indexesEnabled: false
+  fillIndexes:
+    indexesEnabled: false
+    command: "/business-ecosystem-logic-proxy/node-v14.16.0-linux-x64/bin/node /business-ecosystem-logic-proxy/fill_indexes.js"
   ## href base path of LP
   lpHref: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev
   ## Target namespace for init data

@@ -1,4 +1,4 @@
-{{- if .Values.initData.indexesEnabled -}}
+{{- if .Values.initData.fillIndexes.indexesEnabled -}}
 apiVersion: v1
 kind: Pod
 metadata:
