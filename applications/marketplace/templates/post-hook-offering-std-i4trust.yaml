@@ -1,15 +1,15 @@
-{{- if .Values.initData.i4trust.enabled -}}
+{{- if or .Values.initData.createOfferings.standardI4Trust.basicEnabled .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: market-offering-i4t-create-{{ randAlphaNum 5 | lower }}
+  name: mp-offering-i4t-std-create-{{ randAlphaNum 5 | lower }}
   annotations:
     "helm.sh/hook": post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
     "helm.sh/hook-weight": "5"
 spec:
   containers:
-    - name: market-offering-i4t-create
+    - name: mp-offering-i4t-std-create
       image: python:3
       command:
         - /bin/sh
@@ -20,7 +20,7 @@ spec:
   volumes:
     - name: scripts
       configMap:
-        name: marketplace-create-offering-i4t-cm
+        name: mp-create-offering-i4t-std-cm
   restartPolicy: Never
 
 {{- end }}

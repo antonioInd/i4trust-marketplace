@@ -629,8 +629,8 @@ initData:
     catalog: []
       #- name: "Packet Delivery services"
       #  description: "Offerings for packet delivery services"
-      #  keyrockHost: "http://consumerone-keyrock:8080"
-      #  username: "consumerone-operator"
+      #  keyrockHost: "http://provider-keyrock:8080"
+      #  username: "provider-operator"
   ## Reloading of indexes after creation of objects
   fillIndexes:
     indexesEnabled: false
@@ -639,15 +639,45 @@ initData:
   lpHref: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev
   ## Target namespace for init data
   targetNamespace: i4t-mp-main
-  ## Creation of i4Trust offering
-  i4trust:
-    ## Creation of i4trust offering enabled
-    enabled: false
+  ## Creation of offerings
+  createOfferings:
     ## internal href base path
-    lpHrefInternal: http://marketplace-biz-ecosystem-logic-proxy.i4t-mp-main.svc.cluster.local:8004
-    ## Enpoint of data service (Kong PEP endpoint)
-    serviceEndpoint: https://provider-kong-kong-i4t-mp-main.apps.fiware.fiware.dev/diagnosis-i4trust/ngsi-ld/v1
+    lpHrefInternal: http://marketplace-biz-ecosystem-logic-proxy.i4t-main.svc.cluster.local:8004
     ## Endpoint of provider AR (activation service endpoint)
-    arEndpoint: https://provider-as-activation-service-i4t-mp-main.apps.fiware.fiware.dev
+    arEndpoint: https://provider-as-activation-service-i4t-main.apps.fiware.fiware.dev
+    ## AR identifier EORI
+    arIdentifier: "EU.EORI.DEPROVIDER"
+    ## Offerings for standard i4Trust OIDC
+    standardI4Trust:
+      ## Creation of standard i4Trust OIDC basic offering enabled
+      basicEnabled: false
+      ## Creation of standard i4Trust OIDC premium offering enabled
+      premiumEnabled: false
+      ## Enpoint of data service (Kong PEP endpoint)
+      serviceEndpoint: https://provider-kong-kong-i4t-main.apps.fiware.fiware.dev/packetdelivery/ngsi-ld/v1
+      ## Hostname of provider Keyrock
+      keyrockHost: "http://provider-keyrock:8080"
+      ## Username of provider operator creating the offering
+      username: "provider-operator"
+      ## Provider identifier EORI
+      providerIdentifier: "EU.EORI.DEPROVIDER"
+      ## ID of the asset plugin
+      pluginId: "ngsi-ld-data-service"
+      ## Name of the catalog for the offering
+      catalogName: "Packet Delivery services"
+      ## Resource type
+      resourceType: "DELIVERYORDER"
+      
+    ## Offerings for i4Trust via DID and VC/VP
+    didI4Trust:
+      ## Creation of i4Trust DID and VC/VP basic offering enabled
+      basicEnabled: false
+      ## Creation of i4Trust DID and VC/VP premium offering enabled
+      premiumEnabled: false
+      ## Enpoint of data service (Kong PEP endpoint)
+      serviceEndpoint: https://provider-kong-kong-i4t-main.apps.fiware.fiware.dev/orion-vc/ngsi-ld/v1
+    
+    
+    
     
     

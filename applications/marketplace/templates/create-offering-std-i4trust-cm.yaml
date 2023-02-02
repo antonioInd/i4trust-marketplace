@@ -1,7 +1,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: marketplace-create-offering-i4t-cm
+  name: mp-create-offering-i4t-std-cm
   annotations:
     "helm.sh/hook": post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
@@ -18,24 +18,46 @@ data:
     from bson import ObjectId
     import sys
     
-    def main():
-      KEYROCK_HOST = "http://provider-keyrock:8080"
+    def createOffering(keyrock_hostname, user, offering):
+      KEYROCK_HOST = keyrock_hostname
       APIS_HOST = "http://marketplace-biz-ecosystem-apis:8080"
-      LP_INTERNAL_HOST = {{ .Values.initData.i4trust.lpHrefInternal | quote }}
+      LP_INTERNAL_HOST = {{ .Values.initData.createOfferings.lpHrefInternal | quote }}
       LP_EXTERNAL_HOST = {{ .Values.initData.lpHref | quote }}
       LP_EXTERNAL_HOST = LP_EXTERNAL_HOST+":443"
-      SERVICE_ENDPOINT = {{ .Values.initData.i4trust.serviceEndpoint | quote }}
-      AR_ENDPOINT = {{ .Values.initData.i4trust.arEndpoint | quote }}
-      OPERATOR_USER = "provider-operator"
-      PROVIDER_EORI = "EU.EORI.DEPROVIDER"
-      PLUGIN_ID = "ngsi-ld-data-service"
+      SERVICE_ENDPOINT = offering['service_endpoint']
+      AR_ENDPOINT = offering['ar_endpoint']
+      AR_EORI = offering['ar_eori']
+      OPERATOR_USER = user
+      PROVIDER_EORI = offering['provider_eori']
+      PLUGIN_ID = offering['plugin_id']
       ASSET_TYPE = "NGSI-LD Data Service"
-      CATALOG_NAME = "Packet Delivery"
+      MEDIA_TYPE = "FIWARE NGSI-LD"
+      CONTENT_TYPE = "fiware ngsi-ld"
+      SPEC_BRAND = "Packet Delivery Co."
+      PREMIUM_PATCH_ATTRS = "pta,pda"
+      PREMIUM_PATCH_IDS = "*"
+      CATALOG_NAME = offering['catalog_name']
       MONGODB_HOST = "mongodb"
       MONGODB_USER = "root"
       MONGODB_PW = "dbPassword"
       MONGODB_PORT = "27017"
       MONGODB_DB = "charging_db"
+
+      # Naming and descriptions
+      SPEC_NAME = ""
+      SPEC_DESC = ""
+      OFFER_NAME = ""
+      OFFER_DESC = ""
+      if offering['is_premium']:
+        SPEC_NAME = "Packet Delivery Premium Service Product (Standard OIDC)"
+        SPEC_DESC = "Service for retrieving and updating packet delivery order information using standard OIDC flow"
+        OFFER_NAME = "Packet Delivery Premium Service (Standard OIDC)"
+        OFFER_DESC = "Premium service that allows for read- and write-access on packet delivery order information. The access rights can be delegated to your customers, enabling them to view all information of their delivery orders as well as to change the planned date and time of arrival. The data service of this offering uses the standard i4Trust OIDC flow."
+      else:
+        SPEC_NAME = "Packet Delivery Basic Service Product (Standard OIDC)"
+        SPEC_DESC = "Service for retrieving packet delivery order information using standard OIDC flow"
+        OFFER_NAME = "Packet Delivery Basic Service (Standard OIDC)"
+        OFFER_DESC = "Basic service that allows for read-access on packet delivery order information. The access right can be delegated to your customers, enabling them to view their delivery orders. The data service of this offering uses the standard i4Trust OIDC flow."
 
       # Login
       login_data = {
@@ -129,55 +151,61 @@ data:
       # Simulate uploadJob --> fill wstore_resource, with provider_id = _id param from created org, get asset ID
       print("Insert resource for digital asset in MongoDB")
       col_resource = db['wstore_resource']
+      meta_info = {
+        "ar_id": AR_EORI,
+        "ar_token_endpoint": AR_ENDPOINT+"/token",
+        "ar_policy_endpoint": AR_ENDPOINT+"/createpolicy",
+        "minutes": 30,
+        "resource_type": offering['resource_type'],
+        "get_allowed": True,
+        "get_ids": "*",
+        "get_attributes": "*",
+        "patch_allowed": False,
+        "post_allowed": False,
+        "delete_allowed": False,
+        "patch_subscription_allowed": False,
+        "get_subscription_allowed": False,
+        "post_subscription_allowed": False,
+        "delete_subscription_allowed": False,
+        "notification_allowed": False,
+        "sidecar_endpoint_config_allowed": False,
+        "idp_id": PROVIDER_EORI,
+        "patch_attributes": "*",
+        "patch_ids": "*",
+        "post_attributes": "*",
+        "post_ids": "*",
+        "delete_attributes": "*",
+        "delete_ids": "*",
+        "get_subscription_attributes": "*",
+        "get_subscription_ids": "*",
+        "patch_subscription_attributes": "*",
+        "patch_subscription_ids": "*",
+        "post_subscription_attributes": "*",
+        "post_subscription_ids": "*",
+        "delete_subscription_attributes": "*",
+        "delete_subscription_ids": "*",
+        "notification_attributes": "*",
+        "notification_ids": "*"
+      }
+      if offering['is_premium']:
+        meta_info['patch_allowed'] = True
+        meta_info['patch_attributes'] = PREMIUM_PATCH_ATTRS
+        meta_info['patch_ids'] = PREMIUM_PATCH_IDS
+        
       resource_insert = {
         "product_id": "DUMMY_PROD_ID",
         "version": "0.1",
         "provider_id": ObjectId(org_id),
-        "content_type": "fiware ngsi-ld",
+        "content_type": CONTENT_TYPE,
         "download_link": SERVICE_ENDPOINT,
         "resource_path": "",
         "old_versions": None,
         "state": "attached",
-        "resource_type": "NGSI-LD Data Service",
+        "resource_type": ASSET_TYPE,
         "is_public": False,
         "has_terms": False,
         "bundled_assets": [ ],
-        "meta_info": {
-            "ar_id": PROVIDER_EORI,
-            "ar_token_endpoint": AR_ENDPOINT+"/token",
-            "ar_policy_endpoint": AR_ENDPOINT+"/createpolicy",
-            "minutes": 30,
-            "resource_type": "DUMMY",
-            "get_allowed": True,
-            "get_ids": "*",
-            "get_attributes": "*",
-            "patch_allowed": False,
-            "post_allowed": False,
-            "delete_allowed": False,
-            "patch_subscription_allowed": False,
-            "get_subscription_allowed": False,
-            "post_subscription_allowed": False,
-            "delete_subscription_allowed": False,
-            "notification_allowed": False,
-            "sidecar_endpoint_config_allowed": False,
-            "idp_id": PROVIDER_EORI,
-            "patch_attributes": "*",
-            "patch_ids": "*",
-            "post_attributes": "*",
-            "post_ids": "*",
-            "delete_attributes": "*",
-            "delete_ids": "*",
-            "get_subscription_attributes": "*",
-            "get_subscription_ids": "*",
-            "patch_subscription_attributes": "*",
-            "patch_subscription_ids": "*",
-            "post_subscription_attributes": "*",
-            "post_subscription_ids": "*",
-            "delete_subscription_attributes": "*",
-            "delete_subscription_ids": "*",
-            "notification_attributes": "*",
-            "notification_ids": "*"
-        }
+        "meta_info": meta_info
       }
       resource_result = col_resource.insert_one(resource_insert)
       resource = col_resource.find_one({'_id': resource_result.inserted_id})
@@ -218,7 +246,7 @@ data:
                     {
                         "default": True,
                         "unitOfMeasure": "",
-                        "value": "FIWARE NGSI-LD",
+                        "value": MEDIA_TYPE,
                         "valueFrom": "",
                         "valueTo": ""
                     }
@@ -262,7 +290,7 @@ data:
                 "productSpecCharacteristicValue": [
                     {
                         "valueType": "string",
-                        "value": "DUMMY",
+                        "value": offering['resource_type'],
                         "unitOfMeasure": "",
                         "valueFrom": "",
                         "valueTo": "",
@@ -316,10 +344,48 @@ data:
                 "role": "Owner"
             }
         ],
-        "name": "Packet Delivery Product (i4Trust)",
-        "brand": "Packet Delivery Co.",
-        "description": "Packet Delivery data service product"
+        "name": SPEC_NAME,
+        "brand": SPEC_BRAND,
+        "description": SPEC_DESC
       }
+      
+      if offering['is_premium']:
+        premium_characteristics = [
+          {
+                "name": "PATCH Entity Attributes Permission",
+                "description": "Entity attributes that can be patched",
+                "valueType": "string",
+                "configurable": False,
+                "productSpecCharacteristicValue": [
+                    {
+                        "valueType": "string",
+                        "value": PREMIUM_PATCH_ATTRS,
+                        "unitOfMeasure": "",
+                        "valueFrom": "",
+                        "valueTo": "",
+                        "default": True
+                    }
+                ]
+            },
+            {
+                "name": "PATCH Entity IDs",
+                "description": "Entity IDs that can be patched",
+                "valueType": "string",
+                "configurable": False,
+                "productSpecCharacteristicValue": [
+                    {
+                        "valueType": "string",
+                        "value": PREMIUM_PATCH_IDS,
+                        "unitOfMeasure": "",
+                        "valueFrom": "",
+                        "valueTo": "",
+                        "default": True
+                    }
+                ]
+            }
+        ]
+        spec_data["productSpecCharacteristic"].extend(premium_characteristics)
+        
       print("Create productSpecification and get ID")
       spec_response = requests.post(APIS_HOST+'/DSProductCatalog/api/catalogManagement/v2/productSpecification', json=spec_data, headers=spec_header)
       try:
@@ -366,10 +432,10 @@ data:
       offering_data = {
         "bundledProductOffering": [],
         "category": [],
-        "description": "Packet Delivery data service",
+        "description": OFFER_DESC,
         "isBundle": False,
         "lifecycleStatus": "Launched",
-        "name": "Packet Delivery Service (i4Trust)",
+        "name": OFFER_NAME,
         "place": [],
         "productOfferingPrice": [],
         "validFor": {
@@ -421,7 +487,7 @@ data:
         "off_id": str(offering_id),
         "href": offering_href,
         "owner_organization_id": ObjectId(org_id),
-        "name": "Packet Delivery service",
+        "name": OFFER_NAME,
         "version": "1.0",
         "description": "",
         "is_digital": True,
@@ -432,6 +498,41 @@ data:
       offering_result = col_offering.insert_one(offering_insert)
       print(" --> Created offering in DB!")
 
+
+    def main():
+
+      offering = {
+        'plugin_id': {{ .Values.initData.createOfferings.standardI4Trust.pluginId | quote }},
+        'service_endpoint': {{ .Values.initData.createOfferings.standardI4Trust.serviceEndpoint | quote }},
+        'ar_endpoint': {{ .Values.initData.createOfferings.standardI4Trust.arEndpoint | quote }},
+        'ar_eori': {{ .Values.initData.createOfferings.standardI4Trust.arIdentifier | quote }},
+        'catalog_name': {{ .Values.initData.createOfferings.standardI4Trust.catalogName | quote }},
+        'provider_eori': {{ .Values.initData.createOfferings.standardI4Trust.providerIdentifier | quote }},
+        'resource_type': {{ .Values.initData.createOfferings.standardI4Trust.resourceType | quote }}
+      }
+      
+      {{- if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
+      
+      # Create basic offering
+      offering['is_premium'] = False
+      print("********")
+      print("Create basic offering for i4Trust standard OIDC")
+      createOffering({{ .Values.initData.createOfferings.standardI4Trust.keyrockHost | quote }}, {{ .Values.initData.createOfferings.standardI4Trust.username | quote }}, offering)
+      print("********")
+      print("")
+      {{- end }}
+
+
+      {{- if .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
+
+      # Create premium offering
+      offering['is_premium'] = True
+      print("********")
+      print("Create premium offering for i4Trust standard OIDC")
+      createOffering({{ .Values.initData.createOfferings.standardI4Trust.keyrockHost | quote }}, {{ .Values.initData.createOfferings.standardI4Trust.username | quote }}, offering)
+      print("********")
+      print("")
+      {{- end }}
 
     if __name__ == "__main__":
       main()
