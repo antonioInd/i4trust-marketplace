@@ -54,6 +54,8 @@ data:
     from pymongo import MongoClient
     from bson import ObjectId
     import sys
+
+    OPERATOR_OUT_FILE = "/tmp/offering/operator.txt"
     
     def createOffering(keyrock_hostname, user, offering):
       KEYROCK_HOST = keyrock_hostname
@@ -76,8 +78,7 @@ data:
       PREMIUM_PATCH_ATTRS = "pta,pda"
       PREMIUM_PATCH_IDS = "*"
       BASIC_IMAGE = {{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename | quote }}
-      PREMIUM_IMAGE = {{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename | quote }}
-      OPERATOR_OUT_FILE = "/tmp/offering/operator.txt"
+      PREMIUM_IMAGE = {{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename | quote }}      
       CATALOG_NAME = offering['catalog_name']
       MONGODB_HOST = "mongodb"
       MONGODB_USER = "root"
@@ -567,10 +568,8 @@ data:
       offering_result = col_offering.insert_one(offering_insert)
       print(" --> Created offering in DB!")
 
-      # Store operator ID in file for further processing
-      f = open(OPERATOR_OUT_FILE, "a")
-      f.write(operator_id)
-      f.close()
+      return operator_id
+      
 
     def main():
 
@@ -583,6 +582,8 @@ data:
         'provider_eori': {{ .Values.initData.createOfferings.standardI4Trust.providerIdentifier | quote }},
         'resource_type': {{ .Values.initData.createOfferings.standardI4Trust.resourceType | quote }}
       }
+
+      operator_id = None
       
       {{ if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
       
@@ -590,7 +591,7 @@ data:
       offering['is_premium'] = False
       print("********")
       print("Create basic offering for i4Trust standard OIDC")
-      createOffering({{ .Values.initData.createOfferings.standardI4Trust.keyrockHost | quote }}, {{ .Values.initData.createOfferings.standardI4Trust.username | quote }}, offering)
+      operator_id = createOffering({{ .Values.initData.createOfferings.standardI4Trust.keyrockHost | quote }}, {{ .Values.initData.createOfferings.standardI4Trust.username | quote }}, offering)
       print("********")
       print("")
       {{- end }}
@@ -602,10 +603,16 @@ data:
       offering['is_premium'] = True
       print("********")
       print("Create premium offering for i4Trust standard OIDC")
-      createOffering({{ .Values.initData.createOfferings.standardI4Trust.keyrockHost | quote }}, {{ .Values.initData.createOfferings.standardI4Trust.username | quote }}, offering)
+      operator_id = createOffering({{ .Values.initData.createOfferings.standardI4Trust.keyrockHost | quote }}, {{ .Values.initData.createOfferings.standardI4Trust.username | quote }}, offering)
       print("********")
       print("")
       {{- end }}
+
+      # Store operator ID in file for further processing
+      if operator_id:
+        f = open(OPERATOR_OUT_FILE, "a")
+        f.write(operator_id)
+        f.close()
 
     if __name__ == "__main__":
       main()
