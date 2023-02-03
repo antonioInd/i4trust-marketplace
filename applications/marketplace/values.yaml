@@ -669,6 +669,8 @@ initData:
       catalogName: "Packet Delivery services"
       ## Resource type
       resourceType: "DELIVERYORDER"
+      ## Enable upload of images for displaying offerings on marketplace
+      uploadImages: false
       ## Download path for basic offering image
       basicImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-Standard_Basic.png"
       ## Filename for basic offering image

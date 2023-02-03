@@ -10,11 +10,18 @@ data:
   entrypoint.sh: |-
     pip3 install requests pymongo
     echo "Creating i4Trust offerings for standard OIDC..."
+
+    {{ if .Values.initData.createOfferings.standardI4Trust.uploadImages -}}
+    # Create dir for download of offering images
     mkdir -p /tmp/offering
+
+    {{- end }}
+
+    # Create offerings
     python /scripts/create.py
 
-    {{ if or .Values.initData.createOfferings.standardI4Trust.basicEnabled .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
-
+    {{ if .Values.initData.createOfferings.standardI4Trust.uploadImages -}}
+    # Create dir in pod for uploading of offering images
     echo "============="
     echo "Uploading images for offerings"
     echo "Login to OC cluster"
@@ -31,7 +38,7 @@ data:
     {{- end }}
     
     {{ if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
-
+    # Copy image for basic offering
     echo "Copy image for basic offering"
     cd /tmp/offering
     wget {{ .Values.initData.createOfferings.standardI4Trust.basicImagePath }} -O /tmp/offering/{{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename }}
@@ -40,7 +47,7 @@ data:
     {{- end }}
 
     {{ if .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
-
+    # Copy image for premium offering
     echo "Copy image for premium offering"
     cd /tmp/offering
     wget {{ .Values.initData.createOfferings.standardI4Trust.premiumImagePath }} -O /tmp/offering/{{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename }}
@@ -608,11 +615,15 @@ data:
       print("")
       {{- end }}
 
+      {{ if .Values.initData.createOfferings.standardI4Trust.uploadImages -}}
+      
       # Store operator ID in file for further processing
       if operator_id:
         f = open(OPERATOR_OUT_FILE, "a")
         f.write(operator_id)
         f.close()
+
+      {{- end }}
 
     if __name__ == "__main__":
       main()
