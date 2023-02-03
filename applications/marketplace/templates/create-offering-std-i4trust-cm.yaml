@@ -10,6 +10,7 @@ data:
   entrypoint.sh: |-
     pip3 install requests pymongo
     echo "Creating i4Trust offerings for standard OIDC..."
+    mkdir -p /tmp/offering
     python /scripts/create.py
 
     {{ if or .Values.initData.createOfferings.standardI4Trust.basicEnabled .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
@@ -22,7 +23,7 @@ data:
     echo "Get ChargingBackend pod"
     POD_NAME=`kubectl -n $TARGET_NAMESPACE get pod -l component=biz-ecosystem-charging-backend -o jsonpath='{.items[0].metadata.name}'`
     echo $POD_NAME
-    OPERATORID=`cat operator.txt`
+    OPERATORID=`cat /tmp/offering/operator.txt`
 
     echo "Create asset media directory for service provider"
     kubectl -n $TARGET_NAMESPACE exec -i $POD_NAME -c business-api-ecosystem-biz-ecosystem-charging-backend -- mkdir -p /opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}
@@ -32,18 +33,18 @@ data:
     {{ if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
 
     echo "Copy image for basic offering"
-    cd /scripts
-    wget {{ .Values.initData.createOfferings.standardI4Trust.basicImagePath }} -O /scripts/{{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename }}
-    kubectl -n $TARGET_NAMESPACE -c business-api-ecosystem-biz-ecosystem-charging-backend cp /scripts/{{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename }} $POD_NAME:/opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}/.
+    cd /tmp/offering
+    wget {{ .Values.initData.createOfferings.standardI4Trust.basicImagePath }} -O /tmp/offering/{{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename }}
+    kubectl -n $TARGET_NAMESPACE -c business-api-ecosystem-biz-ecosystem-charging-backend cp /tmp/offering/{{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename }} $POD_NAME:/opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}/.
 
     {{- end }}
 
     {{ if .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
 
     echo "Copy image for premium offering"
-    cd /scripts
-    wget {{ .Values.initData.createOfferings.standardI4Trust.premiumImagePath }} -O /scripts/{{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename }}
-    kubectl -n $TARGET_NAMESPACE -c business-api-ecosystem-biz-ecosystem-charging-backend cp /scripts/{{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename }} $POD_NAME:/opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}/.
+    cd /tmp/offering
+    wget {{ .Values.initData.createOfferings.standardI4Trust.premiumImagePath }} -O /tmp/offering/{{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename }}
+    kubectl -n $TARGET_NAMESPACE -c business-api-ecosystem-biz-ecosystem-charging-backend cp /tmp/offering/{{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename }} $POD_NAME:/opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}/.
 
     {{- end }}
     
@@ -76,6 +77,7 @@ data:
       PREMIUM_PATCH_IDS = "*"
       BASIC_IMAGE = {{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename | quote }}
       PREMIUM_IMAGE = {{ .Values.initData.createOfferings.standardI4Trust.premiumImageFilename | quote }}
+      OPERATOR_OUT_FILE = "/tmp/offering/operator.txt"
       CATALOG_NAME = offering['catalog_name']
       MONGODB_HOST = "mongodb"
       MONGODB_USER = "root"
@@ -566,7 +568,7 @@ data:
       print(" --> Created offering in DB!")
 
       # Store operator ID in file for further processing
-      f = open("/scripts/operator.txt", "a")
+      f = open(OPERATOR_OUT_FILE, "a")
       f.write(operator_id)
       f.close()
 
