@@ -12,7 +12,7 @@ data:
     echo "Creating i4Trust offerings for standard OIDC..."
     python /scripts/create.py
 
-    {{- if or .Values.initData.createOfferings.standardI4Trust.basicEnabled .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
+    {{ if or .Values.initData.createOfferings.standardI4Trust.basicEnabled .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
 
     echo "============="
     echo "Uploading images for offerings"
@@ -29,7 +29,7 @@ data:
 
     {{- end }}
     
-    {{- if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
+    {{ if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
 
     echo "Copy image for basic offering"
     cd /scripts
@@ -38,7 +38,7 @@ data:
 
     {{- end }}
 
-    {{- if .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
+    {{ if .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
 
     echo "Copy image for premium offering"
     cd /scripts
@@ -582,7 +582,7 @@ data:
         'resource_type': {{ .Values.initData.createOfferings.standardI4Trust.resourceType | quote }}
       }
       
-      {{- if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
+      {{ if .Values.initData.createOfferings.standardI4Trust.basicEnabled -}}
       
       # Create basic offering
       offering['is_premium'] = False
@@ -594,7 +594,7 @@ data:
       {{- end }}
 
 
-      {{- if .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
+      {{ if .Values.initData.createOfferings.standardI4Trust.premiumEnabled -}}
 
       # Create premium offering
       offering['is_premium'] = True
