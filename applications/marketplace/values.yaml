@@ -127,7 +127,8 @@ business-api-ecosystem:
         #tag: 8.1.0-pre-5
         tag: v8.1.0-dev
         ## -- specification of the image pull policy
-        pullPolicy: IfNotPresent
+        #pullPolicy: IfNotPresent
+        pullPolicy: Always
           
     ## -- PVC configuration for charging backend plugins
     plugins:
@@ -361,8 +362,8 @@ business-api-ecosystem:
         #tag: 8.1.0-pre
         tag: v8.1.0-dev
         ## -- specification of the image pull policy
-        #pullPolicy: Always
-        pullPolicy: IfNotPresent
+        pullPolicy: Always
+        #pullPolicy: IfNotPresent
     
     ## openshift specific route definition. Will not work on plain k8s
     route:
