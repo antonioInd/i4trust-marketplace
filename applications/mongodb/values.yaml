@@ -70,8 +70,10 @@ mongodb:
 initDb:
   externalIdp:
     clientID: "EU.EORI.DEMARKETPLACE"
-    tokenKey: "/business-ecosystem-logic-proxy/key.pem"
-    tokenCrt: "/business-ecosystem-logic-proxy/cert.pem"
+    #tokenKey: "/business-ecosystem-logic-proxy/key.pem"
+    tokenKey: "/opt/business-ecosystem-logic-proxy/key.pem"
+    #tokenCrt: "/business-ecosystem-logic-proxy/cert.pem"
+    tokenCrt: "/opt/business-ecosystem-logic-proxy/cert.pem"
     idp: []
       #- name: "Service Provider"
       #  id: "EU.EORI.DEPROVIDER"
