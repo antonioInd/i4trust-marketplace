@@ -34,6 +34,7 @@ data:
     {
       "name" : {{ $v.name | quote }},
       "idpId" : {{ $v.id | quote }},
+      "issuerDid": {{ $v.did | quote }},
       "server" : {{ $v.server | quote }},
       "description" : {{ $v.description | quote }},
       "provider" : "i4trust",
