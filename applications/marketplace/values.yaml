@@ -639,7 +639,8 @@ initData:
   ## Should be enabled, when catalogs and/or offerings are created during initialization
   fillIndexes:
     indexesEnabled: false
-    command: "/business-ecosystem-logic-proxy/node-v14.16.0-linux-x64/bin/node /business-ecosystem-logic-proxy/fill_indexes.js"
+    #command: "/business-ecosystem-logic-proxy/node-v14.16.0-linux-x64/bin/node /business-ecosystem-logic-proxy/fill_indexes.js"
+    command: "/usr/local/bin/node /opt/business-ecosystem-logic-proxy/fill_indexes.js"
   ## href base path of LP
   lpHref: https://marketplace-biz-ecosystem-logic-proxy-0-i4t-mp-main.apps.fiware.fiware.dev
   ## Target namespace for init data
