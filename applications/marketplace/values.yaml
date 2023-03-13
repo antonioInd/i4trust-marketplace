@@ -629,16 +629,16 @@ initData:
       #  phoneNumber: "+4915121234567"
   ## Create catalogs for the service provider
   createCatalog:
-    catalogEnabled: false
-    catalog: []
-      #- name: "Packet Delivery services"
-      #  description: "Offerings for packet delivery services"
-      #  keyrockHost: "http://provider-keyrock:8080"
-      #  username: "provider-operator"
+    catalogEnabled: true
+    catalog: #[]
+      - name: "Packet Delivery services"
+        description: "Offerings for packet delivery services"
+        keyrockHost: "http://provider-keyrock:8080"
+        username: "provider-operator"
   ## Reloading of indexes after creation of objects
   ## Should be enabled, when catalogs and/or offerings are created during initialization
   fillIndexes:
-    indexesEnabled: false
+    indexesEnabled: true
     #command: "/business-ecosystem-logic-proxy/node-v14.16.0-linux-x64/bin/node /business-ecosystem-logic-proxy/fill_indexes.js"
     command: "/usr/local/bin/node /opt/business-ecosystem-logic-proxy/fill_indexes.js"
   ## href base path of LP
