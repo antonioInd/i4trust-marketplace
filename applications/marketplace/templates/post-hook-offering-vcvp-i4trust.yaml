@@ -1,0 +1,40 @@
+{{- if or .Values.initData.createOfferings.vcvpI4Trust.basicEnabled .Values.initData.createOfferings.vcvpI4Trust.premiumEnabled -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mp-offering-i4t-vcvp-create-{{ randAlphaNum 5 | lower }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "6"
+spec:
+  containers:
+    - name: mp-offering-i4t-vcvp-create
+      #image: python:3
+      image: quay.io/openshift/origin-cli:4.9.0
+      command:
+        - /bin/sh
+        - /scripts/entrypoint.sh
+      volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+      env:
+        - name: OPENSHIFT_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: marketplace-secret
+              key: openshiftServer
+        - name: OPENSHIFT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: marketplace-secret
+              key: openshiftToken
+        - name: TARGET_NAMESPACE
+          value: {{ .Values.initData.targetNamespace | quote }}
+  volumes:
+    - name: scripts
+      configMap:
+        name: mp-create-offering-i4t-vcvp-cm
+  restartPolicy: Never
+
+{{- end }}

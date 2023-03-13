@@ -674,7 +674,7 @@ initData:
       ## Resource type
       resourceType: "DELIVERYORDER"
       ## Enable upload of images for displaying offerings on marketplace
-      uploadImages: false
+      uploadImages: true
       ## Download path for basic offering image
       basicImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-Standard_Basic.png"
       ## Filename for basic offering image
@@ -683,15 +683,39 @@ initData:
       premiumImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-Standard_Premium.png"
       ## Filename for premium offering image
       premiumImageFilename: "PacketDeliveryPremium__Offerings-Standard_Premium.png"
-      
-    ## Offerings for i4Trust via DID and VC/VP
-    didI4Trust:
-      ## Creation of i4Trust DID and VC/VP basic offering enabled
+    ## Offerings for VC/VP i4Trust flows
+    vcvpI4Trust:
+      ## Creation of i4Trust VC/VP basic offering enabled
       basicEnabled: false
-      ## Creation of i4Trust DID and VC/VP premium offering enabled
+      ## Creation of i4Trust VC/VP premium offering enabled
       premiumEnabled: false
       ## Enpoint of data service (Kong PEP endpoint)
-      serviceEndpoint: https://provider-kong-kong-i4t-main.apps.fiware.fiware.dev/orion-vc/ngsi-ld/v1
+      serviceEndpoint: https://provider-kong-kong-i4t-main.apps.fiware.fiware.dev/packetdelivery-vc/ngsi-ld/v1
+      ## Hostname of provider Keyrock
+      keyrockHost: "http://provider-keyrock:8080"
+      ## Username of provider operator creating the offering
+      username: "provider-operator"
+      ## ID of the asset plugin
+      pluginId: "ngsi-ld-data-service-for-verifiablecredentials"
+      ## Name of the catalog for the offering
+      catalogName: "Packet Delivery services"
+      ## Resource type
+      vcType: "PacketDeliveryService"
+      ## Roles for basic offering
+      rolesBasic: "STANDARD_CUSTOMER"
+      ## Roles for premium offering
+      rolesPremium: "STANDARD_CUSTOMER,GOLD_CUSTOMER"
+      ## Enable upload of images for displaying offerings on marketplace
+      uploadImages: true
+      ## Download path for basic offering image
+      basicImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-VCVP_Basic.png"
+      ## Filename for basic offering image
+      basicImageFilename: "PacketDeliveryBasic__Offerings-VCVP_Basic.png"
+      ## Download path for premium offering image
+      premiumImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-VCVP_Premium.png"
+      ## Filename for premium offering image
+      premiumImageFilename: "PacketDeliveryPremium__Offerings-VCVP_Premium.png"
+
     
     
     

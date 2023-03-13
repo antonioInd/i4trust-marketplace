@@ -1,0 +1,545 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: mp-create-offering-i4t-vcvp-cm
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "6"
+data:
+  entrypoint.sh: |-
+    pip3 install requests pymongo
+    echo "Creating i4Trust offerings for VC/VP..."
+
+    {{ if .Values.initData.createOfferings.vcvpI4Trust.uploadImages -}}
+    # Create dir for download of offering images
+    mkdir -p /tmp/offering
+
+    {{- end }}
+
+    # Create offerings
+    python /scripts/create.py
+
+    {{ if .Values.initData.createOfferings.vcvpI4Trust.uploadImages -}}
+    # Create dir in pod for uploading of offering images
+    echo "============="
+    echo "Uploading images for offerings"
+    echo "Login to OC cluster"
+    oc login $OPENSHIFT_SERVER --token="${OPENSHIFT_TOKEN}"
+    echo "Target namespace:" $TARGET_NAMESPACE
+    echo "Get ChargingBackend pod"
+    POD_NAME=`kubectl -n $TARGET_NAMESPACE get pod -l component=biz-ecosystem-charging-backend -o jsonpath='{.items[0].metadata.name}'`
+    echo $POD_NAME
+    OPERATORID=`cat /tmp/offering/operator2.txt`
+
+    echo "Create asset media directory for service provider"
+    kubectl -n $TARGET_NAMESPACE exec -i $POD_NAME -c business-api-ecosystem-biz-ecosystem-charging-backend -- mkdir -p /opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}
+
+    {{- end }}
+    
+    {{ if .Values.initData.createOfferings.vcvpI4Trust.basicEnabled -}}
+    # Copy image for basic offering
+    echo "Copy image for basic offering"
+    cd /tmp/offering
+    wget {{ .Values.initData.createOfferings.vcvpI4Trust.basicImagePath }} -O /tmp/offering/{{ .Values.initData.createOfferings.vcvpI4Trust.basicImageFilename }}
+    kubectl -n $TARGET_NAMESPACE -c business-api-ecosystem-biz-ecosystem-charging-backend cp /tmp/offering/{{ .Values.initData.createOfferings.vcvpI4Trust.basicImageFilename }} $POD_NAME:/opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}/.
+
+    {{- end }}
+
+    {{ if .Values.initData.createOfferings.vcvpI4Trust.premiumEnabled -}}
+    # Copy image for premium offering
+    echo "Copy image for premium offering"
+    cd /tmp/offering
+    wget {{ .Values.initData.createOfferings.vcvpI4Trust.premiumImagePath }} -O /tmp/offering/{{ .Values.initData.createOfferings.vcvpI4Trust.premiumImageFilename }}
+    kubectl -n $TARGET_NAMESPACE -c business-api-ecosystem-biz-ecosystem-charging-backend cp /tmp/offering/{{ .Values.initData.createOfferings.vcvpI4Trust.premiumImageFilename }} $POD_NAME:/opt/business-ecosystem-charging-backend/src/media/assets/${OPERATORID}/.
+
+    {{- end }}
+    
+  create.py: |-
+    import requests
+    from requests.exceptions import HTTPError
+    from pymongo import MongoClient
+    from bson import ObjectId
+    import sys
+
+    OPERATOR_OUT_FILE = "/tmp/offering/operator2.txt"
+    
+    def createOffering(keyrock_hostname, user, offering):
+      KEYROCK_HOST = keyrock_hostname
+      APIS_HOST = "http://marketplace-biz-ecosystem-apis:8080"
+      LP_INTERNAL_HOST = {{ .Values.initData.createOfferings.lpHrefInternal | quote }}
+      LP_EXTERNAL_HOST = {{ .Values.initData.lpHref | quote }}
+      LP_EXTERNAL_HOST = LP_EXTERNAL_HOST+":443"
+      SERVICE_ENDPOINT = offering['service_endpoint']
+      AR_ENDPOINT = offering['ar_endpoint']
+      AR_EORI = offering['ar_eori']
+      AR_TOKEN_ENDPOINT = "/token"
+      AR_POLICY_ENDPOINT = "/createpolicy"
+      OPERATOR_USER = user
+      ROLES = offering['roles']
+      PLUGIN_ID = offering['plugin_id']
+      ASSET_TYPE = "NGSI-LD Data Service for VerifiableCredentials"
+      MEDIA_TYPE = "FIWARE NGSI-LD"
+      CONTENT_TYPE = "fiware ngsi-ld"
+      SPEC_BRAND = "Packet Delivery Co."
+      BASIC_IMAGE = {{ .Values.initData.createOfferings.vcvpI4Trust.basicImageFilename | quote }}
+      PREMIUM_IMAGE = {{ .Values.initData.createOfferings.vcvpI4Trust.premiumImageFilename | quote }}      
+      CATALOG_NAME = offering['catalog_name']
+      MONGODB_HOST = "mongodb"
+      MONGODB_USER = "root"
+      MONGODB_PW = "dbPassword"
+      MONGODB_PORT = "27017"
+      MONGODB_DB = "charging_db"
+
+      # Naming and descriptions
+      SPEC_NAME = ""
+      SPEC_DESC = ""
+      OFFER_NAME = ""
+      OFFER_DESC = ""
+      OFFER_IMG = ""
+      if offering['is_premium']:
+        SPEC_NAME = "Packet Delivery Premium Service Product (VC/VP)"
+        SPEC_DESC = "Service for retrieving and updating packet delivery order information using VC/VP flow"
+        OFFER_NAME = "Packet Delivery Premium Service (VC/VP)"
+        OFFER_DESC = "Premium service that allows for read- and write-access on packet delivery order information. The access rights can be delegated to your customers, enabling them to view all information of their delivery orders as well as to change the planned date and time of arrival. The data service of this offering uses the VC/VP flow."
+        OFFER_IMG = PREMIUM_IMAGE
+      else:
+        SPEC_NAME = "Packet Delivery Basic Service Product (VC/VP)"
+        SPEC_DESC = "Service for retrieving packet delivery order information using VC/VP flow"
+        OFFER_NAME = "Packet Delivery Basic Service (VC/VP)"
+        OFFER_DESC = "Basic service that allows for read-access on packet delivery order information. The access right can be delegated to your customers, enabling them to view their delivery orders. The data service of this offering uses the i4Trust VC/VP flow."
+        OFFER_IMG = BASIC_IMAGE
+
+      # Login
+      login_data = {
+        'name': "admin@test.com",
+        'password': "admin"
+      }
+      login_header = {
+        'Content-Type': 'application/json'
+      }
+      print("Login at Keyrock of provider")
+      login_response = requests.post(KEYROCK_HOST+'/v1/auth/tokens', json=login_data, headers=login_header)
+      try:
+        login_response.raise_for_status()
+      except HTTPError as e:
+        print(e.response.text)
+        sys.exit(1)
+      token = login_response.headers["X-Subject-Token"]
+
+      # Get list of users and obtain user ID
+      user_header = {
+        'Content-Type': 'application/json',
+        'X-Auth-token': token
+      }
+      print("Get list of users and look up <"+OPERATOR_USER+">")
+      user_response = requests.get(KEYROCK_HOST+'/v1/users', headers=user_header)
+      try:
+        user_response.raise_for_status()
+      except HTTPError as e:
+        print(e.response.text)
+        sys.exit(1)
+      users = user_response.json()['users']
+      operator_id = None
+      for u in users:
+        if u['username'] == OPERATOR_USER:
+          operator_id = u['id']
+          break
+      if not operator_id:
+        print("Could not find user <"+OPERATOR_USER+">")
+        sys.exit(2)
+      print("User ID:", operator_id)
+
+      # Get asset types from DB --> wstore_resourceplugin
+      print("Get asset types from MongoDB")
+      mongoUri = ('mongodb://%s:%s@%s:%s/%s?authSource=admin' % (MONGODB_USER, MONGODB_PW, MONGODB_HOST, MONGODB_PORT, MONGODB_DB))
+      client = MongoClient(mongoUri)
+      db = client[MONGODB_DB]
+      col_assettypes = db['wstore_resourceplugin']
+      cur_asset_types = col_assettypes.find({'plugin_id': PLUGIN_ID})
+      if not cur_asset_types[0]:
+        print("Plugin <"+PLUGIN_ID+"> not found")
+        sys.exit(3)
+      asset_type = cur_asset_types[0]
+      print(" --> Found!")
+
+      # Fill wstore_organization, name=operator_id
+      print("Upsert organization in MongoDB")
+      col_orgs = db['wstore_organization']
+      org_query = {
+        'name': operator_id
+      }
+      org_update = {
+        'name': operator_id,
+        'notification_url': None,
+        'acquired_offerings': [],
+        'private': True,
+        'correlation_number': 0,
+        'managers': [ 1 ],
+        'actor_id': None,
+        'idp': PROVIDER_EORI
+      }
+      org_result = col_orgs.update_one(org_query, { '$set': org_update }, upsert=True)
+      organization = col_orgs.find_one({'name': operator_id})
+      org_id = organization['_id']
+      print(" --> Created/updated organization:", org_id)
+
+      # Fill wstore_userprofile, current_org=_id param from created org
+      print("Upsert user profile in MongoDB")
+      col_user = db['wstore_userprofile']
+      user_update = {
+        'user_id': 1,
+        'current_organization_id': ObjectId(org_id),
+        'complete_name': OPERATOR_USER,
+        'actor_id': OPERATOR_USER,
+        'current_roles': [ "provider" ],
+        'access_token': 'token'
+      }
+      user_result = col_user.update_one({ 'actor_id': OPERATOR_USER }, { '$set': user_update }, upsert=True)
+      user_profile = col_user.find_one({'actor_id': OPERATOR_USER})
+      print(" --> Created/update user profile:", user_profile)
+
+      # Simulate uploadJob --> fill wstore_resource, with provider_id = _id param from created org, get asset ID
+      print("Insert resource for digital asset in MongoDB")
+      col_resource = db['wstore_resource']
+      meta_info = {
+        "ar_id": AR_EORI,
+        "ar_token_endpoint": AR_ENDPOINT+AR_TOKEN_ENDPOINT,
+        "ar_policy_endpoint": AR_ENDPOINT+AR_POLICY_ENDPOINT,
+        "minutes": 30,
+        "vc_type": offering['vc_type'],
+        "role_names": offering['roles']
+      }
+        
+      resource_insert = {
+        "product_id": "DUMMY_PROD_ID",
+        "version": "0.1",
+        "provider_id": ObjectId(org_id),
+        "content_type": CONTENT_TYPE,
+        "download_link": SERVICE_ENDPOINT,
+        "resource_path": "",
+        "old_versions": None,
+        "state": "attached",
+        "resource_type": ASSET_TYPE,
+        "is_public": False,
+        "has_terms": False,
+        "bundled_assets": [ ],
+        "meta_info": meta_info
+      }
+      resource_result = col_resource.insert_one(resource_insert)
+      resource = col_resource.find_one({'_id': resource_result.inserted_id})
+      resource_id = resource['_id']
+      print(" --> Created resource:", resource_id, resource)
+
+      # Simulate uploadJob of image upload --> fill wstore_resource, with provider_id = _id param from created org
+      print("Insert resource for digital asset in MongoDB")
+      col_resource = db['wstore_resource']
+      img_resource_insert = {
+        "product_id": None,
+        "version": "",
+        "provider_id": ObjectId(org_id),
+        "content_type": "image/png",
+        "download_link": LP_EXTERNAL_HOST+"/charging/media/assets/"+operator_id+"/"+OFFER_IMG,
+        "resource_path": "media/assets/"+operator_id+"/"+OFFER_IMG,
+        "old_versions": None,
+        "state": "",
+        "resource_type": "",
+        "is_public": True,
+        "has_terms": False,
+        "bundled_assets": [],
+        "meta_info": {}
+      }
+      img_resource_result = col_resource.insert_one(img_resource_insert)
+      img_resource = col_resource.find_one({'_id': img_resource_result.inserted_id})
+      img_resource_id = img_resource['_id']
+      print(" --> Created resource:", img_resource_id, img_resource)
+    
+      # POST productSpec
+      spec_header = {
+        'Content-Type': 'application/json;charset=UTF-8'
+      }
+      spec_data = {
+        "version": "1.0",
+        "lifecycleStatus": "Launched",
+        "isBundle": False,
+        "bundledProductSpecification": [],
+        "productSpecCharacteristic": [
+            {
+                "name": "Asset type",
+                "description": "Type of the digital asset described in this product specification",
+                "valueType": "string",
+                "configurable": False,
+                "productSpecCharacteristicValue": [
+                    {
+                        "default": True,
+                        "unitOfMeasure": "",
+                        "value": ASSET_TYPE,
+                        "valueFrom": "",
+                        "valueTo": ""
+                    }
+                ]
+            },
+            {
+                "name": "Media type",
+                "description": "Media type of the digital asset described in this product specification",
+                "valueType": "string",
+                "configurable": False,
+                "productSpecCharacteristicValue": [
+                    {
+                        "default": True,
+                        "unitOfMeasure": "",
+                        "value": MEDIA_TYPE,
+                        "valueFrom": "",
+                        "valueTo": ""
+                    }
+                ]
+            },
+            {
+                "name": "Location",
+                "description": "URL pointing to the digital asset described in this product specification",
+                "valueType": "string",
+                "configurable": False,
+                "productSpecCharacteristicValue": [
+                    {
+                        "default":True,
+                        "unitOfMeasure": "",
+                        "value": SERVICE_ENDPOINT,
+                        "valueFrom": "",
+                        "valueTo": ""
+                    }
+                ]
+            },
+            {
+                "name": "Asset",
+                "description": "ID of the asset being offered as registered in the BAE",
+                "valueType": "string",
+                "configurable": False,
+                "productSpecCharacteristicValue": [
+                    {
+                        "default": True,
+                        "unitOfMeasure": "",
+                        "value": str(resource_id),
+                        "valueFrom": "",
+                        "valueTo": ""
+                    }
+                ]
+            },
+            {
+                "name": "VC type",
+                "description": "VC type that access is granted",
+                "valueType": "string",
+                "configurable": False,
+                "productSpecCharacteristicValue": [
+                    {
+                        "valueType": "string",
+                        "value": offering['vc_type'],
+                        "unitOfMeasure": "",
+                        "valueFrom": "",
+                        "valueTo": "",
+                        "default": True
+                    }
+                ]
+            },
+            {
+                "name": "Role Names",
+                "description": "Role names that get assigned",
+                "valueType": "string",
+                "configurable": False,
+                "productSpecCharacteristicValue": [
+                    {
+                        "valueType": "string",
+                        "value": ROLES,
+                        "unitOfMeasure": "",
+                        "valueFrom": "",
+                        "valueTo": "",
+                        "default": True
+                    }
+                ]
+            }
+        ],
+        "productSpecificationRelationship": [],
+        "attachment": [
+            {
+                "type": "Picture",
+                "url": LP_EXTERNAL_HOST+"/charging/media/assets/"+operator_id+"/"+OFFER_IMG
+            }
+        ],
+        "relatedParty": [
+            {
+                "id": operator_id,
+                "href": LP_EXTERNAL_HOST+"/DSPartyManagement/api/partyManagement/v2/individual/"+operator_id,
+                "role": "Owner"
+            }
+        ],
+        "name": SPEC_NAME,
+        "brand": SPEC_BRAND,
+        "description": SPEC_DESC
+      }
+        
+      print("Create productSpecification and get ID")
+      spec_response = requests.post(APIS_HOST+'/DSProductCatalog/api/catalogManagement/v2/productSpecification', json=spec_data, headers=spec_header)
+      try:
+        spec_response.raise_for_status()
+      except HTTPError as e:
+        print(e.response.text)
+        sys.exit(1)
+      if not spec_response.json()['id']:
+        print("No productSpecification ID in response")
+        sys.exit(3)
+      spec_id = spec_response.json()['id']
+      spec_href = spec_response.json()['href']
+      print(" --> Created! productSpecification ID:", spec_id)
+        
+
+      # Update product ID in wstore_resource
+      print("Update product_id in resource in MongoDB")
+      col_resource.update_one({'_id': resource_id}, { '$set': {'product_id': spec_id} })
+      print(" --> Done!")
+
+
+      # Get catalog ID
+      print("Getting catalog ID")
+      cat_response = requests.get(APIS_HOST+'/DSProductCatalog/api/catalogManagement/v2/catalog')
+      try:
+        cat_response.raise_for_status()
+      except HTTPError as e:
+        print(e.response.text)
+        sys.exit(1)
+      if not cat_response.json() and len(cat_response.json())<1:
+        print("No catalogs found")
+        sys.exit(3)
+      cat_id = None
+      for c in cat_response.json():
+        if c['name'] == CATALOG_NAME:
+            cat_id = c['id']
+            break
+      if not cat_id:
+        print("Could not find catalog <"+CATALOG_NAME+">")
+        sys.exit(2)
+      print(" --> Catalog ID:", cat_id)
+    
+      # POST productOffering
+      offering_data = {
+        "bundledProductOffering": [],
+        "category": [],
+        "description": OFFER_DESC,
+        "isBundle": False,
+        "lifecycleStatus": "Launched",
+        "name": OFFER_NAME,
+        "place": [],
+        "productOfferingPrice": [],
+        "validFor": {
+            "startDateTime": "2023-01-18T14:49:18+01:00"
+        },
+        "version": "1.0",
+        "serviceCandidate": {
+            "id": "defaultRevenue",
+            "name": "Revenue Sharing Service"
+        },
+        "productSpecification": {
+            "id": str(spec_id),
+            "href": LP_INTERNAL_HOST+"/DSProductCatalog/api/catalogManagement/v2/productSpecification/"+str(spec_id)
+        },
+        "productOfferingTerm": [
+            {
+                "name": "",
+                "description": "",
+                "type": "None",
+                "isFullCustom": False,
+                "exclusivity": "",
+                "sector": "",
+                "region": "",
+                "purpose": "",
+                "transferability": "",
+                "validFor": {}
+            }
+        ]
+      }
+      print("Create productOffering")
+      offering_response = requests.post(APIS_HOST+'/DSProductCatalog/api/catalogManagement/v2/catalog/'+str(cat_id)+'/productOffering', json=offering_data, headers=spec_header)
+      try:
+        offering_response.raise_for_status()
+      except HTTPError as e:
+        print(e.response.text)
+        sys.exit(1)
+      if not offering_response.json()['id']:
+        print("No productOffering ID in response")
+        sys.exit(3)
+      offering_id = offering_response.json()['id']
+      offering_href = offering_response.json()['href']
+      print(" --> Created! productOffering ID:", offering_id)
+    
+
+      # Fill wstore_offering, href from productSpec
+      print("Insert offering in MongoDB")
+      col_offering = db['wstore_offering']
+      offering_insert = {
+        "off_id": str(offering_id),
+        "href": offering_href,
+        "owner_organization_id": ObjectId(org_id),
+        "name": OFFER_NAME,
+        "version": "1.0",
+        "description": "",
+        "is_digital": True,
+        "asset_id": resource_id,
+        "is_open": False,
+        "bundled_offerings": [ ]
+      }
+      offering_result = col_offering.insert_one(offering_insert)
+      print(" --> Created offering in DB!")
+
+      return operator_id
+      
+
+    def main():
+
+      offering = {
+        'plugin_id': {{ .Values.initData.createOfferings.vcvpI4Trust.pluginId | quote }},
+        'service_endpoint': {{ .Values.initData.createOfferings.vcvpI4Trust.serviceEndpoint | quote }},
+        'ar_endpoint': {{ .Values.initData.createOfferings.arEndpoint | quote }},
+        'ar_eori': {{ .Values.initData.createOfferings.arIdentifier | quote }},
+        'catalog_name': {{ .Values.initData.createOfferings.vcvpI4Trust.catalogName | quote }},
+        'roles': "",
+        'vc_type': {{ .Values.initData.createOfferings.vcvpI4Trust.vcType | quote }}
+      }
+
+      operator_id = None
+      
+      {{ if .Values.initData.createOfferings.vcvpI4Trust.basicEnabled -}}
+      
+      # Create basic offering
+      offering['is_premium'] = False
+      offering['roles'] = {{ .Values.initData.createOfferings.vcvpI4Trust.rolesBasic | quote }}
+      print("********")
+      print("Create basic offering for i4Trust VC/VP")
+      operator_id = createOffering({{ .Values.initData.createOfferings.vcvpI4Trust.keyrockHost | quote }}, {{ .Values.initData.createOfferings.vcvpI4Trust.username | quote }}, offering)
+      print("********")
+      print("")
+      {{- end }}
+
+
+      {{ if .Values.initData.createOfferings.vcvpI4Trust.premiumEnabled -}}
+
+      # Create premium offering
+      offering['is_premium'] = True
+      offering['roles'] = {{ .Values.initData.createOfferings.vcvpI4Trust.rolesPremium | quote }}
+      print("********")
+      print("Create premium offering for i4Trust VC/VP")
+      operator_id = createOffering({{ .Values.initData.createOfferings.vcvpI4Trust.keyrockHost | quote }}, {{ .Values.initData.createOfferings.vcvpI4Trust.username | quote }}, offering)
+      print("********")
+      print("")
+      {{- end }}
+
+      {{ if .Values.initData.createOfferings.vcvpI4Trust.uploadImages -}}
+      
+      # Store operator ID in file for further processing
+      if operator_id:
+        f = open(OPERATOR_OUT_FILE, "a")
+        f.write(operator_id)
+        f.close()
+
+      {{- end }}
+
+    if __name__ == "__main__":
+      main()
+
