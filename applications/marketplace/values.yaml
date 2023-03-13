@@ -630,15 +630,15 @@ initData:
   ## Create catalogs for the service provider
   createCatalog:
     catalogEnabled: true
-    catalog: #[]
-      - name: "Packet Delivery services"
-        description: "Offerings for packet delivery services"
-        keyrockHost: "http://provider-keyrock:8080"
-        username: "provider-operator"
+    catalog: []
+      #- name: "Packet Delivery services"
+      #  description: "Offerings for packet delivery services"
+      #  keyrockHost: "http://provider-keyrock:8080"
+      #  username: "provider-operator"
   ## Reloading of indexes after creation of objects
   ## Should be enabled, when catalogs and/or offerings are created during initialization
   fillIndexes:
-    indexesEnabled: true
+    indexesEnabled: false
     #command: "/business-ecosystem-logic-proxy/node-v14.16.0-linux-x64/bin/node /business-ecosystem-logic-proxy/fill_indexes.js"
     command: "/usr/local/bin/node /opt/business-ecosystem-logic-proxy/fill_indexes.js"
   ## href base path of LP
@@ -686,9 +686,9 @@ initData:
     ## Offerings for VC/VP i4Trust flows
     vcvpI4Trust:
       ## Creation of i4Trust VC/VP basic offering enabled
-      basicEnabled: true
+      basicEnabled: false
       ## Creation of i4Trust VC/VP premium offering enabled
-      premiumEnabled: true
+      premiumEnabled: false
       ## Enpoint of data service (Kong PEP endpoint)
       serviceEndpoint: https://provider-kong-kong-i4t-main.apps.fiware.fiware.dev/packetdelivery-vc/ngsi-ld/v1
       ## Hostname of provider Keyrock
@@ -706,7 +706,7 @@ initData:
       ## Roles for premium offering
       rolesPremium: "STANDARD_CUSTOMER,GOLD_CUSTOMER"
       ## Enable upload of images for displaying offerings on marketplace
-      uploadImages: true
+      uploadImages: false
       ## Download path for basic offering image
       basicImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-VCVP_Basic.png"
       ## Filename for basic offering image
