@@ -674,7 +674,7 @@ initData:
       ## Resource type
       resourceType: "DELIVERYORDER"
       ## Enable upload of images for displaying offerings on marketplace
-      uploadImages: true
+      uploadImages: false
       ## Download path for basic offering image
       basicImagePath: "https://github.com/FIWARE-Ops/i4trust-demonstrator/raw/main/doc/img/Offerings-Standard_Basic.png"
       ## Filename for basic offering image
@@ -686,9 +686,9 @@ initData:
     ## Offerings for VC/VP i4Trust flows
     vcvpI4Trust:
       ## Creation of i4Trust VC/VP basic offering enabled
-      basicEnabled: false
+      basicEnabled: true
       ## Creation of i4Trust VC/VP premium offering enabled
-      premiumEnabled: false
+      premiumEnabled: true
       ## Enpoint of data service (Kong PEP endpoint)
       serviceEndpoint: https://provider-kong-kong-i4t-main.apps.fiware.fiware.dev/packetdelivery-vc/ngsi-ld/v1
       ## Hostname of provider Keyrock
