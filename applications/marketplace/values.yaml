@@ -139,12 +139,12 @@ business-api-ecosystem:
     ## -- PVC configuration for charging backend plugins
     plugins:
       ## -- Enable the PVC for plugins storage
-      enabled: false
+      enabled: true
 
     ## -- PVC configuration for charging backend media directories (/assets and /bills)
     media:
       # -- Enable the PVC for media storage
-      enabled: false
+      enabled: true
     
     ## port that the charging backend container uses
     port: 8006
