@@ -695,6 +695,8 @@ initData:
       keyrockHost: "http://provider-keyrock:8080"
       ## Username of provider operator creating the offering
       username: "provider-operator"
+      ## Provider identifier EORI
+      providerIdentifier: "EU.EORI.DEPROVIDER"
       ## ID of the asset plugin
       pluginId: "ngsi-ld-data-service-for-verifiablecredentials"
       ## Name of the catalog for the offering

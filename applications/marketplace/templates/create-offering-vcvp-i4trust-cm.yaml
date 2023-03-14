@@ -77,6 +77,7 @@ data:
       AR_POLICY_ENDPOINT = "/createpolicy"
       OPERATOR_USER = user
       ROLES = offering['roles']
+      PROVIDER_EORI = offering['provider_eori']
       PLUGIN_ID = offering['plugin_id']
       ASSET_TYPE = "NGSI-LD Data Service for VerifiableCredentials"
       MEDIA_TYPE = "FIWARE NGSI-LD"
@@ -500,6 +501,7 @@ data:
         'ar_eori': {{ .Values.initData.createOfferings.arIdentifier | quote }},
         'catalog_name': {{ .Values.initData.createOfferings.vcvpI4Trust.catalogName | quote }},
         'roles': "",
+        'provider_eori': {{ .Values.initData.createOfferings.vcvpI4Trust.providerIdentifier | quote }},
         'vc_type': {{ .Values.initData.createOfferings.vcvpI4Trust.vcType | quote }}
       }
 
