@@ -77,6 +77,7 @@ data:
       AR_POLICY_ENDPOINT = "/createpolicy"
       OPERATOR_USER = user
       PROVIDER_EORI = offering['provider_eori']
+      PROVIDER_DID = offering['provider_did']
       PLUGIN_ID = offering['plugin_id']
       ASSET_TYPE = "NGSI-LD Data Service"
       MEDIA_TYPE = "FIWARE NGSI-LD"
@@ -179,7 +180,8 @@ data:
         'correlation_number': 0,
         'managers': [ 1 ],
         'actor_id': None,
-        'idp': PROVIDER_EORI
+        'idp': PROVIDER_EORI,
+        'issuerDid': PROVIDER_DID
       }
       org_result = col_orgs.update_one(org_query, { '$set': org_update }, upsert=True)
       organization = col_orgs.find_one({'name': operator_id})
@@ -587,6 +589,7 @@ data:
         'ar_eori': {{ .Values.initData.createOfferings.arIdentifier | quote }},
         'catalog_name': {{ .Values.initData.createOfferings.standardI4Trust.catalogName | quote }},
         'provider_eori': {{ .Values.initData.createOfferings.standardI4Trust.providerIdentifier | quote }},
+        'provider_did': {{ .Values.initData.createOfferings.standardI4Trust.providerDid | quote }},
         'resource_type': {{ .Values.initData.createOfferings.standardI4Trust.resourceType | quote }}
       }
 

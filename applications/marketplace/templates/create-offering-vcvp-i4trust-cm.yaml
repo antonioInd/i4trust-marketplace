@@ -78,6 +78,7 @@ data:
       OPERATOR_USER = user
       ROLES = offering['roles']
       PROVIDER_EORI = offering['provider_eori']
+      PROVIDER_DID = offering['provider_did']
       PLUGIN_ID = offering['plugin_id']
       ASSET_TYPE = "NGSI-LD Data Service for VerifiableCredentials"
       MEDIA_TYPE = "FIWARE NGSI-LD"
@@ -178,7 +179,8 @@ data:
         'correlation_number': 0,
         'managers': [ 1 ],
         'actor_id': None,
-        'idp': PROVIDER_EORI
+        'idp': PROVIDER_EORI,
+        'issuerDid': PROVIDER_DID
       }
       org_result = col_orgs.update_one(org_query, { '$set': org_update }, upsert=True)
       organization = col_orgs.find_one({'name': operator_id})
@@ -209,7 +211,8 @@ data:
         "ar_policy_endpoint": AR_ENDPOINT+AR_POLICY_ENDPOINT,
         "minutes": 30,
         "vc_type": offering['vc_type'],
-        "role_names": offering['roles']
+        "role_names": offering['roles'],
+        "idp_id": PROVIDER_EORI
       }
         
       resource_insert = {
@@ -502,6 +505,7 @@ data:
         'catalog_name': {{ .Values.initData.createOfferings.vcvpI4Trust.catalogName | quote }},
         'roles': "",
         'provider_eori': {{ .Values.initData.createOfferings.vcvpI4Trust.providerIdentifier | quote }},
+        'provider_did': {{ .Values.initData.createOfferings.standardI4Trust.providerDid | quote }},
         'vc_type': {{ .Values.initData.createOfferings.vcvpI4Trust.vcType | quote }}
       }
 

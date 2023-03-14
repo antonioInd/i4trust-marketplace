@@ -667,6 +667,8 @@ initData:
       username: "provider-operator"
       ## Provider identifier EORI
       providerIdentifier: "EU.EORI.DEPROVIDER"
+      # Provider identifier DID
+      providerDid: "did:key:z6MksU6tMfbaDzvaRe5oFE4eZTVTV4HJM4fmQWWGsDGQVsEr"
       ## ID of the asset plugin
       pluginId: "ngsi-ld-data-service"
       ## Name of the catalog for the offering
@@ -697,6 +699,8 @@ initData:
       username: "provider-operator"
       ## Provider identifier EORI
       providerIdentifier: "EU.EORI.DEPROVIDER"
+      # Provider identifier DID
+      providerDid: "did:key:z6MksU6tMfbaDzvaRe5oFE4eZTVTV4HJM4fmQWWGsDGQVsEr"
       ## ID of the asset plugin
       pluginId: "ngsi-ld-data-service-for-verifiablecredentials"
       ## Name of the catalog for the offering
