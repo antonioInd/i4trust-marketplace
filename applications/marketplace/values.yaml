@@ -2,6 +2,12 @@ business-api-ecosystem:
   # is the target environment openshift?
   openshift: true
 
+  initContainer:
+    mysql: 
+      image: "quay.io/wi_stefan/mysql"
+    apis:
+      image: "quay.io/wi_stefan/busybox:1.32"
+
   ## Marketplace OAuth and IdM configuration
   ##
   oauth:
