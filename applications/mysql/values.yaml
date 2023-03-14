@@ -10,7 +10,8 @@ mysql:
 
   image: "quay.io/wi_stefan/mysql"
   imageTag: "5.7"
-
+  busybox:
+    image: "quay.io/wi_stefan/busybox"
   ## Specify password for root user
   ##
   ## Default: random 10 character string
