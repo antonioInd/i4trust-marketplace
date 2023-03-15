@@ -681,6 +681,8 @@ initData:
       catalogName: "Packet Delivery services"
       ## Resource type
       resourceType: "DELIVERYORDER"
+      ## Duration until policy expiration in min (restrict to a short duration for demo purposes)
+      policyDuration: 30
       ## Enable upload of images for displaying offerings on marketplace
       uploadImages: false
       ## Download path for basic offering image
@@ -713,6 +715,8 @@ initData:
       catalogName: "Packet Delivery services"
       ## Resource type
       vcType: "PacketDeliveryService"
+      ## Duration until policy expiration in min (restrict to a short duration for demo purposes)
+      policyDuration: 30
       ## Roles for basic offering
       rolesBasic: "STANDARD_CUSTOMER"
       ## Roles for premium offering

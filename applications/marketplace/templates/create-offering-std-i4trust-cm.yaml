@@ -83,6 +83,7 @@ data:
       MEDIA_TYPE = "FIWARE NGSI-LD"
       CONTENT_TYPE = "fiware ngsi-ld"
       SPEC_BRAND = "Packet Delivery Co."
+      DURATION = offering['duration']
       PREMIUM_PATCH_ATTRS = "pta,pda"
       PREMIUM_PATCH_IDS = "*"
       BASIC_IMAGE = {{ .Values.initData.createOfferings.standardI4Trust.basicImageFilename | quote }}
@@ -188,21 +189,6 @@ data:
       org_id = organization['_id']
       print(" --> Created/updated organization:", org_id)
 
-      # Fill wstore_userprofile, current_org=_id param from created org
-      #print("Upsert user profile in MongoDB")
-      #col_user = db['wstore_userprofile']
-      user_update = {
-        'user_id': 1,
-        'current_organization_id': ObjectId(org_id),
-        'complete_name': OPERATOR_USER,
-        'actor_id': OPERATOR_USER,
-        'current_roles': [ "provider" ],
-        'access_token': 'token'
-      }
-      #user_result = col_user.update_one({ 'actor_id': OPERATOR_USER }, { '$set': user_update }, upsert=True)
-      #user_profile = col_user.find_one({'actor_id': OPERATOR_USER})
-      #print(" --> Created/update user profile:", user_profile)
-
       # Simulate uploadJob --> fill wstore_resource, with provider_id = _id param from created org, get asset ID
       print("Insert resource for digital asset in MongoDB")
       col_resource = db['wstore_resource']
@@ -210,7 +196,7 @@ data:
         "ar_id": AR_EORI,
         "ar_token_endpoint": AR_ENDPOINT+AR_TOKEN_ENDPOINT,
         "ar_policy_endpoint": AR_ENDPOINT+AR_POLICY_ENDPOINT,
-        "minutes": 30,
+        "minutes": DURATION,
         "resource_type": offering['resource_type'],
         "get_allowed": True,
         "get_ids": "*",
@@ -588,6 +574,7 @@ data:
         'ar_endpoint': {{ .Values.initData.createOfferings.arEndpoint | quote }},
         'ar_eori': {{ .Values.initData.createOfferings.arIdentifier | quote }},
         'catalog_name': {{ .Values.initData.createOfferings.standardI4Trust.catalogName | quote }},
+        'duration': {{ .Values.initData.createOfferings.standardI4Trust.policyDuration }},
         'provider_eori': {{ .Values.initData.createOfferings.standardI4Trust.providerIdentifier | quote }},
         'provider_did': {{ .Values.initData.createOfferings.standardI4Trust.providerDid | quote }},
         'resource_type': {{ .Values.initData.createOfferings.standardI4Trust.resourceType | quote }}
