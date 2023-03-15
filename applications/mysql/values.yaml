@@ -19,7 +19,7 @@ mysql:
 
   ## Persist data to a persistent volume
   persistence:
-    enabled: true
+    enabled: false
 
   ## Security context
   securityContext:
