@@ -25,3 +25,7 @@ mysql:
   securityContext:
     enabled: false
 
+  # Args
+  args:
+    - "--max_connections=10000"
+
