@@ -23,6 +23,10 @@ keyrock:
       ## specification of the image pull policy
       #pullPolicy: Always
       pullPolicy: IfNotPresent
+    startupProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      failureThreshold: 10
 
   ## openshift specific route definition. Will not work on plain k8s
   route:
