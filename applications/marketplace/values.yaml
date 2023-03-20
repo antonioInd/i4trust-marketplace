@@ -4,9 +4,9 @@ business-api-ecosystem:
 
   initContainer:
     mysql: 
-      image: "quay.io/wi_stefan/mysql"
+      image: "quay.io/i4trust/mysql"
     apis:
-      image: "quay.io/wi_stefan/busybox:1.32"
+      image: "quay.io/i4trust/busybox:1.32"
 
   ## Marketplace OAuth and IdM configuration
   ##
@@ -127,11 +127,9 @@ business-api-ecosystem:
       image:
         ## -- BAE Charging backend image name
         ## ref: https://hub.docker.com/r/fiware/biz-ecosystem-charging-backend
-        #repository: quay.io/fiware/biz-ecosystem-charging-backend
-        repository: quay.io/wi_stefan/biz-ecosystem-charging-backend
+        repository: quay.io/fiware/biz-ecosystem-charging-backend
         ## -- tag of the image to be used
-        #tag: 8.1.0-pre-5
-        tag: v8.1.0-dev
+        tag: v8.1.0-dev-rc1
         ## -- specification of the image pull policy
         #pullPolicy: IfNotPresent
         pullPolicy: Always
@@ -362,11 +360,9 @@ business-api-ecosystem:
       image:
         ## -- BAE Logic Proxy image name
         ## ref: https://hub.docker.com/r/fiware/biz-ecosystem-logic-proxy
-        #repository: quay.io/fiware/biz-ecosystem-logic-proxy
-        repository: quay.io/wi_stefan/biz-ecosystem-logic-proxy
+        repository: quay.io/fiware/biz-ecosystem-logic-proxy
         ## -- tag of the image to be used
-        #tag: 8.1.0-pre
-        tag: v8.1.0-dev
+        tag: v8.1.0-dev-rc1
         ## -- specification of the image pull policy
         pullPolicy: Always
         #pullPolicy: IfNotPresent
