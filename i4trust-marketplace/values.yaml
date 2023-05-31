@@ -4,6 +4,7 @@
 source: https://github.com/FIWARE-Ops/i4trust-marketplace
 release: i4t-mp-demo
 destination_namespace: &destination i4t-mp-demo
+purpose: &purpose i4trust-demonstrator-env
 branch: &branch main
 secretsEnabled: &secretsEnabled false
 
@@ -94,5 +95,14 @@ applications:
     source_path: applications/satellite
     source_ref: *branch
     destination: *destination
+    helm_values:
+    - values.yaml
+
+  - name: waltid
+    enabled: true
+    source_path: applications/waltid
+    source_ref: *branch
+    destination: *destination
+    purpose: *purpose
     helm_values:
     - values.yaml
