@@ -1,0 +1,27 @@
+postgresql:
+  image:
+    registry: quay.io
+    repository: i4trust/postgresql
+    tag: 15.1.0-debian-11-r30
+  fullnameOverride: postgresql
+  auth:
+    username: keycloak
+    enablePostgresUser: true
+    postgresPassword: dbRootPassword
+    password: dbPassword
+  rbac:
+    create: true
+    rules:
+      - apiGroups:
+        - security.openshift.io
+        resourceNames:
+        - anyuid
+        resources:
+        - securitycontextconstraints
+        verbs:
+        - use    
+  primary:
+    initdb:
+      scripts:
+        create.sh: |
+          psql postgresql://postgres:dbRootPassword@localhost:5432 -c "CREATE DATABASE i4t_marketplace_kc;"
