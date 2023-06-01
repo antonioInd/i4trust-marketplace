@@ -168,7 +168,7 @@ data:
           "protocol": "SIOP-2",
           "attributes": {
               "client.secret.creation.time": "1675260539",
-              "expiryInMin": "3600",
+              "expiryInMin": "5000000",
               "vctypes_ActivationService": "ldp_vc,jwt_vc_json"
 
           },
