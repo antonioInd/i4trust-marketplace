@@ -78,7 +78,7 @@ keycloak:
       enabled: false
     podSecurityContext:
       enabled: false
-    existingConfigmap: consumer-keycloak-hp-realm
+    existingConfigmap: keycloak-bae-realm
   
   extraEnvVars:
   - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
@@ -99,8 +99,8 @@ keycloak:
       subPath: profile.properties
     - name: providers
       mountPath: /opt/bitnami/keycloak/providers/
-    - name: issuer-key
-      mountPath: /opt/keys
+    #- name: issuer-key
+    #  mountPath: /opt/keys
 
   extraVolumes:
     - name: profiles
