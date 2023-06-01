@@ -125,13 +125,13 @@ applications:
     helm_values:
     - values.yaml
     values:
-      #issuerKey:
-      #  d: "gGqnb6ij2s-BGUpAgWVGv9odIHciuF-GuLDqyt2pLm0"
-      #  kid: "z6MkigCEnopwujz8Ten2dzq91nvMjqbKQYcifuZhqBsEkH7g"
-      #  x: "Pr7-Zath5ZMyvikX93LzsJNkl6HcAAJdgrwlBTSE6gs"
+      issuerKey:
+        d: "FoJjD3Q6Wh0JHt-tuN3bwGHmPSWa7p8pVe9P9cDIzWw"
+        kid: "z6MkvdQnXeKgRceAhNsZYjpQjSFcmTXshyGDvnNw7gziQhjG"
+        x: "8FSufgpQ8VXgxnR5svvi-j8_4iXxB0TIsVVb0EiRP7s"
       realm:
         id: bae
-        #did: "did:key:z6MkpMwCqXiva7WiqDuiDtThG6SAupwUVmpeaYrbF7KQHB8v"
+        did: "did:key:z6MksU6tMfbaDzvaRe5oFE4eZTVTV4HJM4fmQWWGsDGQVsEr"
         displayName: "Keycloak Marketplace"
         displayNameHtml: "<div class=\"kc-logo-text\"><span>Keycloak Marketplace</span></div>"
         user:
@@ -150,18 +150,18 @@ applications:
           value: "true"
         - name: KEYCLOAK_LOG_LEVEL
           value: INFO
-        #- name: VCISSUER_ISSUER_DID
-        #  value: "did:key:z6MkigCEnopwujz8Ten2dzq91nvMjqbKQYcifuZhqBsEkH7g"
+        - name: VCISSUER_ISSUER_DID
+          value: "did:key:z6MkvdQnXeKgRceAhNsZYjpQjSFcmTXshyGDvnNw7gziQhjG"
         - name: VCISSUER_WALTID_ADDRESS
           value: "http://waltid-vcwaltid"
-        #- name: VCISSUER_ISSUER_KEY_FILE
-        #  value: /opt/keys/keyfile.json
+        - name: VCISSUER_ISSUER_KEY_FILE
+          value: /opt/keys/keyfile.json
       extraVolumes:
         - name: profiles
           configMap:
-            name: consumer-keycloak-hp-profile
-        #- name: issuer-key
-        #  configMap:
-        #    name: consumer-keycloak-hp-key
+            name: keycloak-bae-profile
+        - name: issuer-key
+          configMap:
+            name: keycloak-bae-key
         - name: providers
           emptyDir: {}

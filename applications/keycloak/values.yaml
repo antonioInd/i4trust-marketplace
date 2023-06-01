@@ -4,20 +4,20 @@ route:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge
 
-#issuerKey:
-#  kty: "OKP"
-#  d: "gGqnb6ij2s-BGUpAgWVGv9odIHciuF-GuLDqyt2pLm0"
-#  use: "sig"
-#  crv: "Ed25519"
-#  kid: "z6MkigCEnopwujz8Ten2dzq91nvMjqbKQYcifuZhqBsEkH7g"
-#  x: "Pr7-Zath5ZMyvikX93LzsJNkl6HcAAJdgrwlBTSE6gs"
-#  alg: "EdDSA"
+issuerKey:
+  kty: "OKP"
+  d: "FoJjD3Q6Wh0JHt-tuN3bwGHmPSWa7p8pVe9P9cDIzWw"
+  use: "sig"
+  crv: "Ed25519"
+  kid: "z6MkvdQnXeKgRceAhNsZYjpQjSFcmTXshyGDvnNw7gziQhjG"
+  x: "8FSufgpQ8VXgxnR5svvi-j8_4iXxB0TIsVVb0EiRP7s"
+  alg: "EdDSA"
 
 realm:
   id: bae
   displayName: "Keycloak Marketplace"
   displayNameHtml: "<div class=\"kc-logo-text\"><span>Keycloak Marketplace</span></div>"
-  #did: "did:key:z6MkpMwCqXiva7WiqDuiDtThG6SAupwUVmpeaYrbF7KQHB8v"
+  did: "did:key:z6MksU6tMfbaDzvaRe5oFE4eZTVTV4HJM4fmQWWGsDGQVsEr"
   user:
     - username: marketplace
       email: marketplace@mymail.com
@@ -85,12 +85,12 @@ keycloak:
     value: "true"
   - name: KEYCLOAK_LOG_LEVEL
     value: INFO
-  #- name: VCISSUER_ISSUER_DID
-  #  value: "did:key:z6MkigCEnopwujz8Ten2dzq91nvMjqbKQYcifuZhqBsEkH7g"
+  - name: VCISSUER_ISSUER_DID
+    value: "did:key:z6MkvdQnXeKgRceAhNsZYjpQjSFcmTXshyGDvnNw7gziQhjG"
   - name: VCISSUER_WALTID_ADDRESS
     value: "http://waltid-vcwaltid"
-  #- name: VCISSUER_ISSUER_KEY_FILE
-  #  value: /opt/keys/keyfile.json
+  - name: VCISSUER_ISSUER_KEY_FILE
+    value: /opt/keys/keyfile.json
 
 
   extraVolumeMounts:
@@ -99,16 +99,16 @@ keycloak:
       subPath: profile.properties
     - name: providers
       mountPath: /opt/bitnami/keycloak/providers/
-    #- name: issuer-key
-    #  mountPath: /opt/keys
+    - name: issuer-key
+      mountPath: /opt/keys
 
   extraVolumes:
     - name: profiles
       configMap:
         name: keycloak-bae-profile
-    #- name: issuer-key
-    #  configMap:
-    #    name: keycloak-bae-key
+    - name: issuer-key
+      configMap:
+        name: keycloak-bae-key
     - name: providers
       emptyDir: {}
     
