@@ -626,11 +626,11 @@ loadPlugins:
 lpSpecificRoute:
   routeEnabled: false
   secretName: fiware-dev-wildcard-tls-secret
+  serviceName: "i4t-main-bae-biz-ecosystem-logic-proxy"
   host: bae-lp.i4t-main.fiware.dev
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
-  
 
 ## Configuration for initialization with addresses, catalogs and offerings
 initData:

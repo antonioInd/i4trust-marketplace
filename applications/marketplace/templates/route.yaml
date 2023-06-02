@@ -12,7 +12,7 @@ spec:
   host: {{ .Values.lpSpecificRoute.host }}
   to:
     kind: Service
-    name: {{ $fullName }}
+    name: {{ .Values.lpSpecificRoute.serviceName }}
   {{- if .Values.lpSpecificRoute.tls }}
   tls:
   {{- with .Values.lpSpecificRoute.tls }}
