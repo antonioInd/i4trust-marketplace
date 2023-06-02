@@ -1,5 +1,4 @@
 {{- if .Values.lpSpecificRoute.routeEnabled -}}
-{{- $fullName := include "bizEcosystemLogicProxy.fullname" . -}}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
