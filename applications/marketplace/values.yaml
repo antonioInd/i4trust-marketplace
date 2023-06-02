@@ -615,12 +615,22 @@ business-api-ecosystem:
         gty2Gjmr0kunFqqelUzoqMc7Jh/8EPPjVpK3gJUdZM4JlSHZjA==
         -----END CERTIFICATE-----
 
-
+# Configuration for loading of plugins
 loadPlugins:
   ## Load plugins as post-hook
   pluginsEnabled: true
   ## Target namespace for plugin installation
   targetNamespace: i4t-mp-main
+
+# Config for a specific Route using an already existing secret for the certificate
+lpSpecificRoute:
+  routeEnabled: false
+  secretName: fiware-dev-wildcard-tls-secret
+  host: bae-lp.i4t-main.fiware.dev
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  
 
 ## Configuration for initialization with addresses, catalogs and offerings
 initData:

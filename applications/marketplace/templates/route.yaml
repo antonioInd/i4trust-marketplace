@@ -1,0 +1,22 @@
+{{- if .Values.lpSpecificRoute.routeEnabled -}}
+{{- $fullName := include "bizEcosystemLogicProxy.fullname" . -}}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: marketplace-lp-route
+  labels:
+    {{ include "bizEcosystemLogicProxy.labels" $ | nindent 4 }}
+  annotations:
+    cert-utils-operator.redhat-cop.io/certs-from-secret: {{ .Values.lpSpecificRoute.secretName }}
+spec:
+  host: {{ .Values.lpSpecificRoute.host }}
+  to:
+    kind: Service
+    name: {{ $fullName }}
+  {{- if .Values.lpSpecificRoute.tls }}
+  tls:
+  {{- with .Values.lpSpecificRoute.tls }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
