@@ -86,6 +86,7 @@ applications:
           serviceEndpoint: https://provider-kong-kong-i4t-main.apps.fiware.fiware.dev/diagnosis-i4trust/ngsi-ld/v1
           arEndpoint: https://provider-as-activation-service-i4t-mp-main.apps.fiware.fiware.dev
           arIdentifier: "EU.EORI.DEPROVIDER"
+          tilEndpoint: https://provider-as-activation-service-i4t-main.apps.fiware.fiware.dev/issuer
       business-api-ecosystem:
         oauth:
           server: https://keyrock-0-i4t-mp-main.apps.fiware.fiware.dev
