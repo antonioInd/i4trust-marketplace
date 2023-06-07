@@ -1,0 +1,16 @@
+orion:
+  broker:
+    db:
+      hosts:
+        - mongodb
+      name: orion_tir
+      auth:
+        user: root
+        password: dbPassword
+
+  mongo:
+    # we want to use the individually deployed mongodb
+    enabled: false
+
+  deployment:
+    replicaCount: 1
