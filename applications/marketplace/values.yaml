@@ -686,6 +686,8 @@ initData:
       serviceEndpoint: https://provider-kong-kong-i4t-main.apps.fiware.fiware.dev/packetdelivery/ngsi-ld/v1
       ## Hostname of provider Keyrock
       keyrockHost: "http://provider-keyrock:8080"
+      ## API-Key for AS
+      apikey: "eb4675ed-860e-4de1-a9a7-3e2e4356d08d"
       ## Username of provider operator creating the offering
       username: "provider-operator"
       ## Provider identifier EORI

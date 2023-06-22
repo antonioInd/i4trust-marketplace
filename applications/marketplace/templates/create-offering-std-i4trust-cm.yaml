@@ -76,6 +76,8 @@ data:
       AR_TOKEN_ENDPOINT = "/token"
       AR_POLICY_ENDPOINT = "/createpolicy"
       OPERATOR_USER = user
+      API_KEY_HEADER = "AS-API-KEY"
+      API_KEY = offering['apikey']
       PROVIDER_EORI = offering['provider_eori']
       PROVIDER_DID = offering['provider_did']
       PLUGIN_ID = offering['plugin_id']
@@ -196,6 +198,8 @@ data:
         "ar_id": AR_EORI,
         "ar_token_endpoint": AR_ENDPOINT+AR_TOKEN_ENDPOINT,
         "ar_policy_endpoint": AR_ENDPOINT+AR_POLICY_ENDPOINT,
+        "ar_apikey": API_KEY,
+        "ar_apikey_header": API_KEY_HEADER,
         "minutes": DURATION,
         "resource_type": offering['resource_type'],
         "get_allowed": True,
@@ -573,6 +577,7 @@ data:
         'service_endpoint': {{ .Values.initData.createOfferings.standardI4Trust.serviceEndpoint | quote }},
         'ar_endpoint': {{ .Values.initData.createOfferings.arEndpoint | quote }},
         'ar_eori': {{ .Values.initData.createOfferings.arIdentifier | quote }},
+        'apikey': {{ .Values.initData.createOfferings.standardI4Trust.apikey | quote }},
         'catalog_name': {{ .Values.initData.createOfferings.standardI4Trust.catalogName | quote }},
         'duration': {{ .Values.initData.createOfferings.standardI4Trust.policyDuration }},
         'provider_eori': {{ .Values.initData.createOfferings.standardI4Trust.providerIdentifier | quote }},
