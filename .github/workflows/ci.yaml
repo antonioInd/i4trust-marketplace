@@ -110,7 +110,7 @@ jobs:
         run: |
           cd i4trust-marketplace/
           # render app of apps and apply it
-          helm template ${{ secrets.OVERWRITE_VALUES }} -f values.yaml . | oc -n argocd apply -f -
+          helm template ${{ secrets.OVERWRITE_VALUES }} -f values.yaml . | oc -n openshift-operators apply -f -
           cd ..
 
       - name: Check if all apps are healthy
