@@ -91,7 +91,7 @@ jobs:
           echo "  openshiftToken: ${OS_TOKEN}" >> marketplace-secret.yaml
 
           echo "Sealing secret..."
-          kubeseal <marketplace-secret.yaml >marketplace-sealed-secret.yaml -o yaml --controller-namespace sealed-secrets --controller-name sealed-secrets
+          kubeseal <marketplace-secret.yaml >marketplace-sealed-secret.yaml -o yaml --controller-namespace kube-system --controller-name sealed-secrets-controller
           rm marketplace-secret.yaml
           
           echo "Commit sealed secret..."
